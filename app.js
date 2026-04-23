@@ -3,24 +3,39 @@ let canvas_context=canvas_element.getContext("2d");
 canvas_context.fillStyle="#FF0000";
 let x=50;
 let y =50;
+//wykrywanie klucza
 canvas_context.fillRect(x,y,50,50);
 console.log(canvas_element);
 document.addEventListener("keydown", function(event) {
-
+//ruch 
     if (event.key === "w" || event.key === "ArrowUp") {
-        y-=1;
+        y-=7;
     }
 
     if (event.key === "s" || event.key === "ArrowDown") {
-        y+=1;
+        y+=7;
     }
 
     if (event.key === "a" || event.key === "ArrowLeft") {
-        x-=1;
+        x-=7;
     }
 
     if (event.key === "d" || event.key === "ArrowRight") {
-        x+=1;
+        x+=7;
+    }
+    if (event.key === "w"||event.key==="ArrowUp" && event.key === "ArrowLeft"||event.key==="a") {
+        y-=7;
+        x-=7;
+    }if (event.key === "w"||event.key==="ArrowUp" && event.key === "ArrowRight"||event.key==="d") {
+        y-=7;
+        x+=7;
+    }
+    if (event.key === "s"||event.key==="ArrowDown" && event.key === "ArrowLeft"||event.key==="a") {
+        y-=7;
+        x-=7;
+    }if (event.key === "s"||event.key==="ArrowDown" && event.key === "ArrowRight"||event.key==="d") {
+        y+=7;
+        x+=7;
     }
 
     // czyszczenie canvasa
