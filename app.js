@@ -41,21 +41,9 @@ document.addEventListener("keydown", function(event) {
     // czyszczenie canvasa
     canvas_context.clearRect(0, 0, canvas_element.width, canvas_element.height);
 
-    // ponowne rysowanie
-    canvas_context.fillStyle = "#FF0000";
-    canvas_context.fillRect(x, y, 50, 50);
-});
-cellSize = 50;
+    cellSize = 50;
 cols = 16;
 rows = 12;
-for(i=0;i<rows;i++){
-    for(j=0;j<cols;j++){
-        let x=j*cellSize;
-        let y=i*cellSize;
-         canvas_context.strokeRect(x,y,cellSize,cellSize)
-
-    }
-}
 const maze = [
 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 [1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1],
@@ -70,3 +58,53 @@ const maze = [
 [1,0,1,1,1,0,1,1,1,0,1,1,0,0,1,0],
 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ];
+for(i=0;i<rows;i++){
+    for(j=0;j<cols;j++){
+        let x=j*cellSize;
+        let y=i*cellSize;
+         canvas_context.strokeRect(x,y,cellSize,cellSize)
+         if (maze[i][j] == 1) {
+        canvas_context.fillStyle="black";
+        canvas_context.fillRect(x,y,cellSize,cellSize);
+
+}
+
+    }
+}
+
+
+    // ponowne rysowanie
+    canvas_context.fillStyle = "#FF0000";
+    canvas_context.fillRect(x, y, 50, 50);
+});
+
+cellSize = 50;
+cols = 16;
+rows = 12;
+const maze = [
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+[1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1],
+[1,0,1,1,0,1,0,1,1,1,1,1,0,0,1,0],
+[1,0,0,1,0,0,0,0,0,0,0,0,0,1,1,0],
+[1,1,0,1,1,1,1,1,1,1,1,0,1,0,1,1],
+[1,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1],
+[1,0,1,1,1,1,1,1,1,0,1,1,0,0,1,0],
+[1,0,0,0,0,0,0,0,1,0,0,0,1,0,1,0],
+[1,1,1,1,1,1,1,0,1,1,1,0,0,1,0,0],
+[1,0,0,0,0,0,1,0,0,0,1,0,1,1,0,1],
+[1,0,1,1,1,0,1,1,1,0,1,1,0,0,1,0],
+[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+];
+for(i=0;i<rows;i++){
+    for(j=0;j<cols;j++){
+        let x=j*cellSize;
+        let y=i*cellSize;
+         canvas_context.strokeRect(x,y,cellSize,cellSize)
+         if (maze[i][j] == 1) {
+        canvas_context.fillStyle="black";
+        canvas_context.fillRect(x,y,cellSize,cellSize);
+
+}
+
+    }
+}
