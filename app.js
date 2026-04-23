@@ -45,3 +45,14 @@ document.addEventListener("keydown", function(event) {
     canvas_context.fillStyle = "#FF0000";
     canvas_context.fillRect(x, y, 50, 50);
 });
+cellSize = 50;
+cols = 16;
+rows = 12;
+for(i=0;i<rows;i++){
+    for(j=0;j<cols;j++){
+        let x=j*cellSize;
+        let y=i*cellSize;
+         canvas_context.strokeRect(x,y,cellSize,cellSize)
+
+    }
+}
