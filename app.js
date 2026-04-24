@@ -22,6 +22,7 @@ const maze = [
 [1,0,1,1,1,0,1,1,1,0,1,1,0,0,1,0],
 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ];
+function drawmaze(){
 for(i=0;i<rows;i++){
     for(j=0;j<cols;j++){
         let xCell=j*cellSize;
@@ -34,7 +35,7 @@ for(i=0;i<rows;i++){
 }
 
     }
-}
+}}
     
 
 
