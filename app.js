@@ -1,10 +1,11 @@
+//wczytanie canvasu
 const canvas_element=document.getElementById("canvas_gry");
 const canvas_context=canvas_element.getContext("2d");
 canvas_context.fillStyle="#FF0000";
 let x=50;
 let y =50;
 
-
+//labirynt
         cellSize = 50;
 cols = 16;
 rows = 12;
@@ -22,6 +23,7 @@ const maze = [
 [1,0,1,1,1,0,1,1,1,0,1,1,0,0,1,0],
 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ];
+//rysowanie labiryntu
 function drawmaze(){
 for(i=0;i<rows;i++){
     for(j=0;j<cols;j++){
@@ -36,7 +38,11 @@ for(i=0;i<rows;i++){
 
     }
 }}
-    
+//rysowanie gracza
+    function drawplayer(){
+        canvas_context.fillStyle = "#FF0000";
+    canvas_context.fillRect(x, y, 50, 50);
+    }
 
 
   //wykrywanie klucza
@@ -65,11 +71,9 @@ document.addEventListener("keydown", function(event) {
     // czyszczenie canvasa
     canvas_context.clearRect(0, 0, canvas_element.width, canvas_element.height);
     
-        cellSize = 50;
+        
 
 })
-      // ponowne rysowanie
-    canvas_context.fillStyle = "#FF0000";
-    canvas_context.fillRect(x, y, 50, 50);
+      
 
 
