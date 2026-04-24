@@ -1,5 +1,5 @@
-let canvas_element=document.getElementById("canvas_gry");
-let canvas_context=canvas_element.getContext("2d");
+const canvas_element=document.getElementById("canvas_gry");
+const canvas_context=canvas_element.getContext("2d");
 canvas_context.fillStyle="#FF0000";
 let x=50;
 let y =50;
@@ -23,20 +23,7 @@ document.addEventListener("keydown", function(event) {
     if (event.key === "d" || event.key === "ArrowRight") {
         x+=7;
     }
-    if (event.key === "w"||event.key==="ArrowUp" && event.key === "ArrowLeft"||event.key==="a") {
-        y-=7;
-        x-=7;
-    }if (event.key === "w"||event.key==="ArrowUp" && event.key === "ArrowRight"||event.key==="d") {
-        y-=7;
-        x+=7;
-    }
-    if (event.key === "s"||event.key==="ArrowDown" && event.key === "ArrowLeft"||event.key==="a") {
-        y-=7;
-        x-=7;
-    }if (event.key === "s"||event.key==="ArrowDown" && event.key === "ArrowRight"||event.key==="d") {
-        y+=7;
-        x+=7;
-    }
+    
 
     // czyszczenie canvasa
     canvas_context.clearRect(0, 0, canvas_element.width, canvas_element.height);
