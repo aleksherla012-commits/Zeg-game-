@@ -45,6 +45,9 @@ for(i=0;i<rows;i++){
     }
 
 
+    drawmaze();
+    drawplayer();
+
   //wykrywanie klucza
 canvas_context.fillRect(x,y,50,50);
 console.log(canvas_element);
@@ -70,7 +73,8 @@ document.addEventListener("keydown", function(event) {
 
     // czyszczenie canvasa
     canvas_context.clearRect(0, 0, canvas_element.width, canvas_element.height);
-    
+    drawmaze();
+    drawplayer(); //zawsze najpierw labirynt potem gracz 
         
 
 })
