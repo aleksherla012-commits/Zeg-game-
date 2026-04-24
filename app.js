@@ -54,19 +54,19 @@ console.log(canvas_element);
 document.addEventListener("keydown", function(event) {
 //ruch 
     if (event.key === "w" || event.key === "ArrowUp") {
-        y-=7;
+        y-=5;
     }
 
     if (event.key === "s" || event.key === "ArrowDown") {
-        y+=7;
+        y+=5;
     }
 
     if (event.key === "a" || event.key === "ArrowLeft") {
-        x-=7;
+        x-=5;
     }
 
     if (event.key === "d" || event.key === "ArrowRight") {
-        x+=7;
+        x+=5;
     }
     
 
