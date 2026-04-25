@@ -12,15 +12,63 @@ const rows = 20;
 // Meta
 const exit = { row: 18, col: 24 };
 
+// porusza przeciwnikiem co sekundę
+setInterval(function() {
+    const kierunki = [
+        { dr: -1, dc: 0 },
+        { dr: 1, dc: 0 },
+        { dr: 0, dc: -1 },
+        { dr: 0, dc: 1 },
+    ];
+    const losowy = kierunki[Math.floor(Math.random() * 4)];
+    const newRow = enemy.row + losowy.dr;
+    const newCol = enemy.col + losowy.dc;
+    if (canMove(newRow, newCol)) {
+        enemy.row = newRow;
+        enemy.col = newCol;
+    }
+    // jeśli dotknął gracza — zabiera HP
+    if (enemy.row === playerRow && enemy.col === playerCol) {
+        hp--;
+        if (hp <= 0) {
+            playerCol = 1;
+            playerRow = 1;
+            hp = 3;
+        }
+    }
+    const losowy2 = kierunki[Math.floor(Math.random() * 4)];
+    const newRow2 = enemy2.row + losowy2.dr;
+    const newCol2 = enemy2.col + losowy2.dc;
+    if (canMove(newRow2, newCol2)) {
+        enemy2.row = newRow2;
+        enemy2.col = newCol2;
+    }
+    if (enemy2.row === playerRow && enemy2.col === playerCol) {
+        hp--;
+        if (hp <= 0) {
+            playerCol = 1;
+            playerRow = 1;
+            hp = 3;
+        }
+    }
+    render();
+}, 500);
+
+
+
 //hp i pulapki
 let hp = 3;
 const traps = [
-    { row: 3, col: 5 },
-    { row: 7, col: 11 },
-    { row: 12, col: 8 },
-    { row: 15, col: 20 },
-    { row: 10, col: 15 },
+    { row: 1, col: 3 },
+    { row: 5, col: 5 },
+    { row: 9, col: 3 },
+    { row: 13, col: 3 },
+    { row: 17, col: 4 },
 ];
+
+// przeciwnicy
+let enemy = { row: 9, col: 20 };
+let enemy2 = { row: 5, col: 22 };
 
 // pozycja gracza na siatce
 let playerCol = 1;
@@ -74,6 +122,28 @@ for (const trap of traps) {
 }
 }
 
+// rysuje przeciwnicyy
+function drawEnemy() {
+    const margin = 5;
+    canvas_context.fillStyle = "orange";
+    canvas_context.fillRect(
+        enemy.col * cellSize + margin,
+        enemy.row * cellSize + margin,
+        cellSize - margin * 2,
+        cellSize - margin * 2
+    );
+}
+function drawEnemy2() {
+    const margin = 5;
+    canvas_context.fillStyle = "purple";
+    canvas_context.fillRect(
+        enemy2.col * cellSize + margin,
+        enemy2.row * cellSize + margin,
+        cellSize - margin * 2,
+        cellSize - margin * 2
+    );
+}
+
 // rysuje gracza
 function drawPlayer() {
     const margin = 5;
@@ -86,11 +156,21 @@ function drawPlayer() {
     );
 }
 
+// rysuje HP
+function drawHP() {
+    canvas_context.fillStyle = "black";
+    canvas_context.font = "bold 20px Arial";
+    canvas_context.fillText("HP: " + hp, 10, canvas_element.height - 10);
+}
+
 // odświeża ekran
 function render() {
     canvas_context.clearRect(0, 0, canvas_element.width, canvas_element.height);
     drawMaze();
     drawPlayer();
+    drawHP();
+    drawEnemy();
+    drawEnemy2();
 }
 
 // ruch gracza
@@ -107,23 +187,24 @@ document.addEventListener("keydown", function(event) {
     if (canMove(newRow, newCol)) {
         playerRow = newRow;
         playerCol = newCol;
+    }
     // sprawdź czy gracz wszedł na pułapkę
-        
     for (const trap of traps) {
-        if (playerRow === trap.row && playerCol === trap.col) {
-            hp--;
-            alert(`Pułapka! HP: ${hp}`);
-            if (hp <= 0) {
-                alert("Koniec gry!");
-                playerCol = 1;
-                playerRow = 1;
-                hp = 3;
-            }
+    if (playerRow === trap.row && playerCol === trap.col) {
+        hp--;
+        if (hp <= 0) {
+            playerCol = 1;
+            playerRow = 1;
+            hp = 3;
         }
     }
+
+    
+}
     // czy gracz dotarl do mety
     if (playerRow === exit.row && playerCol === exit.col) {
-    alert("Gratulacje, udało ci się!");
+    playerCol = 1;
+    playerRow = 1;
     }
     render();
 });
