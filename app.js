@@ -3,14 +3,24 @@ const canvas_element = document.getElementById("canvas_gry");
 const canvas_context = canvas_element.getContext("2d");
 
 // rozmiar komorki
-const cellSize = 50;
+const cellSize = 30;
 
 // liczba kolumn i wierszy
-const cols = 16;
-const rows = 12;
+const cols = 26;
+const rows = 20;
 
 // Meta
-const exit = { row: 10, col: 14 };
+const exit = { row: 18, col: 24 };
+
+//hp i pulapki
+let hp = 3;
+const traps = [
+    { row: 3, col: 5 },
+    { row: 7, col: 11 },
+    { row: 12, col: 8 },
+    { row: 15, col: 20 },
+    { row: 10, col: 15 },
+];
 
 // pozycja gracza na siatce
 let playerCol = 1;
@@ -18,18 +28,26 @@ let playerRow = 1;
 
 // labirynt: 1 = ściana, 0 = przejście
 const maze = [
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
-    [1,0,1,1,0,1,0,1,1,1,1,1,0,0,1,0],
-    [1,0,1,1,0,0,0,0,0,0,0,0,0,1,1,0],
-    [1,0,1,1,1,1,1,1,1,1,1,0,1,0,1,1],
-    [1,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1],
-    [1,0,1,1,1,1,1,1,1,0,1,1,0,0,1,0],
-    [1,0,0,0,0,0,0,0,1,0,0,0,1,0,1,0],
-    [1,0,1,1,1,1,1,0,1,1,1,0,0,0,0,0],
-    [1,0,0,0,0,0,0,0,0,0,1,0,1,1,0,1],
-    [1,0,1,1,1,0,1,1,1,0,1,1,0,0,1,0],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1],
+    [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,0,1,0,1,1,1,0,1],
+    [1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,1],
+    [1,0,1,0,1,1,1,1,1,1,0,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1],
+    [1,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1],
+    [1,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,0,1,0,1,0,1,1,1,0,1],
+    [1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1],
+    [1,0,1,1,1,0,1,0,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1],
+    [1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
+    [1,1,1,0,1,1,1,0,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1],
+    [1,0,0,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1],
+    [1,0,1,1,1,1,1,0,1,0,1,0,1,1,0,1,1,1,1,1,1,1,0,1,0,1],
+    [1,0,1,0,0,0,1,0,0,0,1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1],
+    [1,0,1,0,1,0,1,1,1,0,1,0,1,0,1,1,1,1,1,1,0,1,1,1,0,1],
+    [1,0,0,0,1,0,0,0,1,0,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0,1],
+    [1,1,1,0,1,1,1,0,1,1,1,0,1,0,1,0,1,1,0,1,1,1,1,1,0,1],
+    [1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ];
 
 // czy można wejść na tę komórkę?
@@ -49,12 +67,17 @@ function drawMaze() {
 // rysuje mete
 canvas_context.fillStyle = "gold";
 canvas_context.fillRect(exit.col * cellSize, exit.row * cellSize, cellSize, cellSize);
+// rysuje pułapki
+for (const trap of traps) {
+    canvas_context.fillStyle = "red";
+    canvas_context.fillRect(trap.col * cellSize, trap.row * cellSize, cellSize, cellSize);
+}
 }
 
 // rysuje gracza
 function drawPlayer() {
     const margin = 5;
-    canvas_context.fillStyle = "#FF0000";
+    canvas_context.fillStyle = "blue";
     canvas_context.fillRect(
         playerCol * cellSize + margin,
         playerRow * cellSize + margin,
@@ -84,6 +107,19 @@ document.addEventListener("keydown", function(event) {
     if (canMove(newRow, newCol)) {
         playerRow = newRow;
         playerCol = newCol;
+    // sprawdź czy gracz wszedł na pułapkę
+        
+    for (const trap of traps) {
+        if (playerRow === trap.row && playerCol === trap.col) {
+            hp--;
+            alert(`Pułapka! HP: ${hp}`);
+            if (hp <= 0) {
+                alert("Koniec gry!");
+                playerCol = 1;
+                playerRow = 1;
+                hp = 3;
+            }
+        }
     }
     // czy gracz dotarl do mety
     if (playerRow === exit.row && playerCol === exit.col) {
