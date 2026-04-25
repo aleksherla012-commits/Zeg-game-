@@ -2,6 +2,20 @@
 const canvas_element = document.getElementById("canvas_gry");
 const canvas_context = canvas_element.getContext("2d");
 
+// tworzy dźwięk(C)
+const audioCtx = new AudioContext();
+function playSound(frequency, duration) {
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    oscillator.frequency.value = frequency;
+    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + duration);
+}
+
 // rozmiar komorki
 const cellSize = 30;
 
@@ -26,6 +40,7 @@ setInterval(function() {
     if (canMove(newRow, newCol)) {
         enemy.row = newRow;
         enemy.col = newCol;
+        playSound(150, 0.3);
     }
     // jeśli dotknął gracza — zabiera HP
     if (enemy.row === playerRow && enemy.col === playerCol) {
@@ -42,6 +57,7 @@ setInterval(function() {
     if (canMove(newRow2, newCol2)) {
         enemy2.row = newRow2;
         enemy2.col = newCol2;
+        playSound(150, 0.3);
     }
     if (enemy2.row === playerRow && enemy2.col === playerCol) {
         hp--;
@@ -187,11 +203,13 @@ document.addEventListener("keydown", function(event) {
     if (canMove(newRow, newCol)) {
         playerRow = newRow;
         playerCol = newCol;
+        playSound(200, 0.05);
     }
     // sprawdź czy gracz wszedł na pułapkę
     for (const trap of traps) {
     if (playerRow === trap.row && playerCol === trap.col) {
         hp--;
+        playSound(100, 0.3);
         if (hp <= 0) {
             playerCol = 1;
             playerRow = 1;
@@ -203,6 +221,7 @@ document.addEventListener("keydown", function(event) {
 }
     // czy gracz dotarl do mety
     if (playerRow === exit.row && playerCol === exit.col) {
+    playSound(800, 0.5);
     playerCol = 1;
     playerRow = 1;
     }
