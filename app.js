@@ -90,6 +90,10 @@ let enemy2 = { row: 5, col: 22 };
 let playerCol = 1;
 let playerRow = 1;
 
+// Wyniki i rekordy
+let score = 0;
+let highScore = 0;
+
 // labirynt: 1 = ściana, 0 = przejście
 const maze = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -177,6 +181,8 @@ function drawHP() {
     canvas_context.fillStyle = "black";
     canvas_context.font = "bold 20px Arial";
     canvas_context.fillText("HP: " + hp, 10, canvas_element.height - 10);
+    canvas_context.fillText("Wynik: " + score, 150, canvas_element.height - 10);
+    canvas_context.fillText("Rekord: " + highScore, 350, canvas_element.height - 10);
 }
 
 // odświeża ekran
@@ -204,6 +210,7 @@ document.addEventListener("keydown", function(event) {
         playerRow = newRow;
         playerCol = newCol;
         playSound(200, 0.05);
+        score++;
     }
     // sprawdź czy gracz wszedł na pułapkę
     for (const trap of traps) {
@@ -222,9 +229,11 @@ document.addEventListener("keydown", function(event) {
     // czy gracz dotarl do mety
     if (playerRow === exit.row && playerCol === exit.col) {
     playSound(800, 0.5);
+    if (highScore === 0 || score < highScore) highScore = score;
+    score = 0;
     playerCol = 1;
     playerRow = 1;
-    }
+}
     render();
 });
 
