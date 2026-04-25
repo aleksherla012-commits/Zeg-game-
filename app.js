@@ -9,6 +9,9 @@ const cellSize = 50;
 const cols = 16;
 const rows = 12;
 
+// Meta
+const exit = { row: 10, col: 14 };
+
 // pozycja gracza na siatce
 let playerCol = 1;
 let playerRow = 1;
@@ -43,6 +46,9 @@ function drawMaze() {
             canvas_context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
         }
     }
+// rysuje mete
+canvas_context.fillStyle = "gold";
+canvas_context.fillRect(exit.col * cellSize, exit.row * cellSize, cellSize, cellSize);
 }
 
 // rysuje gracza
@@ -79,7 +85,10 @@ document.addEventListener("keydown", function(event) {
         playerRow = newRow;
         playerCol = newCol;
     }
-
+    // czy gracz dotarl do mety
+    if (playerRow === exit.row && playerCol === exit.col) {
+    alert("Gratulacje, udało ci się!");
+    }
     render();
 });
 
