@@ -4,13 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Veil of Riddles</title>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas id="canvas_gry" width="780" height="630" >
+    <!-- ekran startowy -->
+    <div id="start-screen">
+        <h1>LABYRINTH</h1>
+        <h2>VEIL OF RIDDLES</h2>
+        <div class="menu">
+            <div class="menu-item" id="btn-new">New Game <span>▷</span></div>
+            <div class="menu-item" id="btn-continue">Continue <span>↺</span></div>
+            <div class="menu-item" id="btn-settings">Settings <span>⚙</span></div>
+            <div class="menu-item" id="btn-quit">Quit <span>✕</span></div>
+        </div>
+    </div>
 
-    </canvas>
+    <!-- gra -->
+    <canvas id="canvas_gry" width="780" height="630"></canvas>
+    <script src="sounds.js"></script>
+    <script src="maze.js"></script>
+    <script src="player.js"></script>
+    <script src="render.js"></script>
+    <script src="enemies.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
