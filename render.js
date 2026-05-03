@@ -68,10 +68,28 @@ function drawHP() {
     canvas_context.fillText("Rekord: " + highScore, 350, canvas_element.height - 10);
 }
 
+//funkcja rysująca przedmiot 
+function drawItems(){
+    for(const item of items){
+        if(item.collected)continue;
+        if(item.type==="heal") canvas_context.fillStyle="lime";
+        if(item.type==="key")canvas_context.fillStyle="yelllow";
+        if(item.type==="riddle")canvas_context.fillStyle="cyan";
+        canvas_context.beginPath();
+        canvas_context.arc(
+            item.col*cellSize+cellSize/2,
+            item.row*cellSize+cellSize/2,
+            8,0,Math.PI*2    
+        );
+        canvas_context.fill();
+    }
+}
+
 // odświeża ekran
 function render() {
     canvas_context.clearRect(0, 0, canvas_element.width, canvas_element.height);
     drawMaze();
+    drawItems();//zawsze pomiedzy maze a palyer 
     drawPlayer();
     drawHP();
     drawEnemy();
