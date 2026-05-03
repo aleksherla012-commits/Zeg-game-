@@ -56,6 +56,8 @@ function drawPlayer() {
         cellSize - margin * 2
     );
 }
+//poziom
+let currentLevel=1;
 
 // rysuje HP
 function drawHP() {
@@ -66,6 +68,8 @@ function drawHP() {
     canvas_context.font = "bold 20px Arial";
     canvas_context.fillText("Wynik: " + score, 150, canvas_element.height - 10);
     canvas_context.fillText("Rekord: " + highScore, 350, canvas_element.height - 10);
+    canvas_context.fillText("Poziom: " + currentLevel, 690, canvas_element.height - 10);
+
     
 }
 
