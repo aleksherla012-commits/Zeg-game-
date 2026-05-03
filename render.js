@@ -119,4 +119,5 @@ function render() {
     drawHP();
     drawEnemy();
     drawEnemy2();
+    if(gameOver)drawGameOver();
 }
