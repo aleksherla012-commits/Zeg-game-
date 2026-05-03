@@ -19,3 +19,11 @@ let playerRow = 1;
 // Wyniki i rekordy
 let score = 0;
 let highScore = 0;
+
+
+//przemioty na mapie 
+let items =[
+    {row: 3,col: 5, type:"heal",collected:false},
+    {row:7, col:12, type:"key", collected: false},
+    {row:11, col:8, type:"riddle", collected:false},
+];
