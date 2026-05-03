@@ -36,26 +36,39 @@ document.addEventListener("keydown", function(event) {
     //sprawdzenie czy gracz wszedł na przedmiot 
     for(const item of items ){
         if(!item.collected && playerRow===item.row && playerCol===item.col){
-            item.collected=true;
+            
             if(item.type==="heal"){
                 if(hp<3) hp++;
                 playSound(600,0.3);
+                item.collected=true;
             }
             if(item.type==="key"){
                 playSound(500,0.2);
                 alert("Znalazłeś klucz!");
+                item.collected=true;
             }
             if(item.type==="riddle"){
                 const answer=prompt("Zagadka:ile nóg ma pająk?");
                 if(answer==="8"){
                     playSound(800,0.4);
                     riddleSolved=true;
+                    item.collected=true;//znika tylko gdy dobrze
                     alert("Dobrze! Wyjście zostało odblokowane .");
 
                 }
                 else{
                     hp--;
                     playSound(100,0.3);
+                    //wysłanie w losowe miejsce 
+                    const freeSpaces=[
+                        {row:3, col:10},
+                        {row:7, col:5},
+                        {row:11, col:15},
+                        {row:15,col:8},
+                    ];
+                    const random=freeSpaces[Math.floor(Math.random()*freeSpaces.length)];
+                    item.row=losowe.row;
+                    item.col=losowe.col;
                     alert("Źle tracisz życie. ");
                 }
             }
