@@ -16,6 +16,36 @@ document.addEventListener("keydown", function(event) {
         playSound(200, 0.05);
         score++;
     }
+
+    //sprawdzenie czy gracz wszedł na przedmiot 
+    for(const item of items ){
+        if(!item.collected && playerRow===item.row && playerCol===item.col){
+            item.collected=true;
+            if(item.type==="heal"){
+                if(hp<3) hp++;
+                playSound(600,0.3);
+            }
+            if(item.type==="key"){
+                playSound(500,0.2);
+                alert("Znalazłeś klucz!");
+            }
+            if(item.type==="riddle"){
+                const answer=prompt("Zagadka:ile nóg ma pająk?");
+                if(answer==="8"){
+                    playSound(800,0.4);
+                    alert("Dobrze! Przejście odblokowane.");
+
+                }
+                else{
+                    hp--;
+                    playSound(100,0.3);
+                    alert("Źle tracisz życie. ");
+                }
+            }
+        }
+    }
+
+
     // sprawdź czy gracz wszedł na pułapkę
     for (const trap of traps) {
     if (playerRow === trap.row && playerCol === trap.col) {
