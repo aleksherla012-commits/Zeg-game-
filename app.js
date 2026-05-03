@@ -4,6 +4,22 @@ document.addEventListener("keydown", function(event) {
     let newRow = playerRow;
     let newCol = playerCol;
 
+    //po naciśnięciu r nastąpi restart
+    if (gameOver){
+        (event.key==="r"||event.key==="R")
+        {
+        playerRow=1;
+        playerCol=1;
+        hp=3;
+        score=0;
+        gameOver=false;
+        riddleSolved=false;
+        for(const item of items ) item.collected=false;
+        render();
+    }
+    return;
+}
+
     if (event.key === "w" || event.key === "ArrowUp")    newRow--;
     if (event.key === "s" || event.key === "ArrowDown")  newRow++;
     if (event.key === "a" || event.key === "ArrowLeft")  newCol--;
@@ -53,9 +69,7 @@ document.addEventListener("keydown", function(event) {
         hp--;
         playSound(100, 0.3);
         if (hp <= 0) {
-            playerCol = 1;
-            playerRow = 1;
-            hp = 3;
+            gameOver=true;
         }
     }
 
