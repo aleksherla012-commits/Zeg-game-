@@ -66,6 +66,7 @@ function drawHP() {
     canvas_context.font = "bold 20px Arial";
     canvas_context.fillText("Wynik: " + score, 150, canvas_element.height - 10);
     canvas_context.fillText("Rekord: " + highScore, 350, canvas_element.height - 10);
+
 }
 
 //funkcja rysująca przedmiot 
@@ -83,6 +84,10 @@ function drawItems(){
         );
         canvas_context.fill();
     }
+    const status=riddleSolved ? "🔓 Wyjście otwarte" : "🔒 Znajdź zagadkę";
+    canvas_context.fillStyle=riddleSolved ? "lime" :"red";
+    canvas_context.font="bold 20px Arial";
+    canvas_context.fillText(status,500,canvas_element.height -10);
 }
 
 // odświeża ekran

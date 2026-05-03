@@ -33,7 +33,8 @@ document.addEventListener("keydown", function(event) {
                 const answer=prompt("Zagadka:ile nóg ma pająk?");
                 if(answer==="8"){
                     playSound(800,0.4);
-                    alert("Dobrze! Przejście odblokowane.");
+                    riddleSolved=true;
+                    alert("Dobrze! Wyjście zostało odblokowane .");
 
                 }
                 else{
