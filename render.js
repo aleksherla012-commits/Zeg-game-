@@ -4,6 +4,8 @@ const canvas_context = canvas_element.getContext("2d");
 
 const heartImg = new Image();
 heartImg.src = 'heart.png';
+const healImg= new Image();
+healImg.src="heart.png";
 
 // rysuje labirynt
 function drawMaze() {
@@ -77,7 +79,7 @@ function drawHP() {
 function drawItems(){
     for(const item of items){
         if(item.collected)continue;
-        if(item.type==="heal") canvas_context.fillStyle="lime";
+        if(item.type==="heal")canvas_context.drawImage(healImg, item.col * cellSize, item.row * cellSize, cellSize, cellSize);
         if(item.type==="key")canvas_context.fillStyle="yelllow";
         if(item.type==="riddle")canvas_context.fillStyle="cyan";
         canvas_context.beginPath();
