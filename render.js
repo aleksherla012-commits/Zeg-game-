@@ -66,7 +66,7 @@ function drawHP() {
     canvas_context.font = "bold 20px Arial";
     canvas_context.fillText("Wynik: " + score, 150, canvas_element.height - 10);
     canvas_context.fillText("Rekord: " + highScore, 350, canvas_element.height - 10);
-
+    canvas_context.fillText("Poziom:" + currentLevel,550,canvas_element.height -10);
 }
 
 //funkcja rysująca przedmiot 
