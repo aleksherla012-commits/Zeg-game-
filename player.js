@@ -28,3 +28,4 @@ let items =[
     {row:11, col:7, type:"riddle", collected:false},
 ];
 let riddleSolved=false;
+let gameOver=false ;

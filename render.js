@@ -93,6 +93,22 @@ function drawItems(){
     canvas_context.font="bold 20px Arial";
     canvas_context.fillText(status,500,canvas_element.height -10);
 }
+//funkcja ekranu końcowego 
+function drawGameOver(){
+    canvas_context.fillStyle="rgba(0,0,0,0.7)";
+    canvas_context.fillRect(0,0,canvas_element.width,canvas_element.height);
+
+    canvas_context.fillStyle="#c0813";
+    canvas_context.font="bold 60px Arial";
+    canvas_context.TextAlign="center"
+    canvas_context.fillText("Koniec gry💀💀💀💀", canvas_element.width / 2, canvas_element.height / 2 - 20);
+
+    canvas_context.fillStyle="#d4c5a9";
+    canvas_context.font="20px Arial";
+    canvas_context.fillText("Naciśnij R aby zagrać ponownie", canvas_element.width / 2, canvas_element.height / 2 + 30);
+
+    canvas_context.TextAlign="left"//resetuje by nie psuć reszty
+}
 
 // odświeża ekran
 function render() {
