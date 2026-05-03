@@ -6,7 +6,7 @@ document.addEventListener("keydown", function(event) {
 
     //po naciśnięciu r nastąpi restart
     if (gameOver){
-        (event.key==="r"||event.key==="R")
+      if  (event.key==="r"||event.key==="R")
         {
         playerRow=1;
         playerCol=1;
