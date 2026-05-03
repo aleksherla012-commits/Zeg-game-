@@ -27,3 +27,4 @@ let items =[
     {row:7, col:12, type:"key", collected: false},
     {row:11, col:7, type:"riddle", collected:false},
 ];
+let riddleSolved=false;

@@ -60,13 +60,21 @@ document.addEventListener("keydown", function(event) {
 
     
 }
-    // czy gracz dotarl do mety
-    if (playerRow === exit.row && playerCol === exit.col) {
-    playSound(800, 0.5);
-    if (highScore === 0 || score < highScore) highScore = score;
-    score = 0;
-    playerCol = 1;
-    playerRow = 1;
+    // czy gracz dotarl do mety i blokowanie go jeżeli nie rozwiązał zagadki 
+if (playerRow === exit.row && playerCol === exit.col) {
+    if (!riddleSolved) {
+        playSound(100, 0.2);
+        alert("Wyjście jest zablokowane! Znajdź zagadkę.");
+        playerRow = 1;
+        playerCol = 1;
+    } else {
+        playSound(800, 0.5);
+        if (highScore === 0 || score < highScore) highScore = score;
+        score = 0;
+        playerRow = 1;
+        playerCol = 1;
+        riddleSolved = false; // reset na następny poziom
+    }
 }
     render();
 });
