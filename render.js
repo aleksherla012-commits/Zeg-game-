@@ -80,6 +80,7 @@ function drawItems(){
     for(const item of items){
         if(item.collected)continue;
         if(item.type==="heal")canvas_context.drawImage(healImg, item.col * cellSize, item.row * cellSize, cellSize, cellSize);
+        else{
         if(item.type==="key")canvas_context.fillStyle="yelllow";
         if(item.type==="riddle")canvas_context.fillStyle="cyan";
         canvas_context.beginPath();
@@ -90,6 +91,7 @@ function drawItems(){
         );
         canvas_context.fill();
     }
+}
     const status=riddleSolved ? "🔓 Wyjście otwarte" : "🔒 Znajdź zagadkę";
     canvas_context.fillStyle=riddleSolved ? "lime" :"red";
     canvas_context.font="bold 20px Arial";
