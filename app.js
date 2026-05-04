@@ -57,18 +57,26 @@ document.addEventListener("keydown", function(event) {
             // ukryj nakładkę po kliknięciu
             overlay.classList.remove("active");
 
+            // ukryj nakładkę po kliknięciu
+            overlay.classList.remove("active");
+ 
             if (btn.dataset.color === "zloty") {
                 // dobra odpowiedź
                 playSound(800, 0.4);
                 riddleSolved = true;
                 item.collected = true;
+                // // blok znika po rozwiązaniu zagadki
+                //     if (!riddleSolved) {
+                //         canvas_context.fillStyle = "cyan";
+                //         canvas_context.fillRect(24 * cellSize, 18 * cellSize, cellSize, cellSize);
+                //     }
             } else {
                 // zła odpowiedź — kara i losowe przesunięcie zagadki
                 hp--;
                 playSound(100, 0.3);
                 const freeSpaces = [
-                    {row:3, col:10}, {row:7, col:5},
-                    {row:11, col:15}, {row:15, col:8},
+                    {row:1, col:10}, {row:7, col:4},
+                    {row:11, col:17}, {row:15, col:23},
                 ];
                 const random = freeSpaces[Math.floor(Math.random() * freeSpaces.length)];
                 item.row = random.row;
@@ -95,19 +103,12 @@ document.addEventListener("keydown", function(event) {
 }
     // czy gracz dotarl do mety i blokowanie go jeżeli nie rozwiązał zagadki 
 if (playerRow === exit.row && playerCol === exit.col) {
-    if (!riddleSolved) {
-        playSound(100, 0.2);
-        alert("Wyjście jest zablokowane! Znajdź zagadkę.");
-        playerRow = 1;
-        playerCol = 1;
-    } else {
-        playSound(800, 0.5);
-        if (highScore === 0 || score < highScore) highScore = score;
-        score = 0;
-        playerRow = 1;
-        playerCol = 1;
-        riddleSolved = false; // reset na następny poziom
-    }
+    playSound(800, 0.5);
+    if (highScore === 0 || score < highScore) highScore = score;
+    score = 0;
+    playerRow = 1;
+    playerCol = 1;
+    riddleSolved = false;
 }
     render();
 });
