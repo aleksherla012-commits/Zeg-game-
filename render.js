@@ -26,25 +26,18 @@ for (const trap of traps) {
 }
 
 // rysuje przeciwnicyy
-function drawEnemy() {
+function drawEnemies() {
+    const kolory = ["orange", "purple"];
     const margin = 5;
-    canvas_context.fillStyle = "orange";
-    canvas_context.fillRect(
-        enemy.col * cellSize + margin,
-        enemy.row * cellSize + margin,
-        cellSize - margin * 2,
-        cellSize - margin * 2
-    );
-}
-function drawEnemy2() {
-    const margin = 5;
-    canvas_context.fillStyle = "purple";
-    canvas_context.fillRect(
-        enemy2.col * cellSize + margin,
-        enemy2.row * cellSize + margin,
-        cellSize - margin * 2,
-        cellSize - margin * 2
-    );
+    for (let i = 0; i < enemies.length; i++) {
+        canvas_context.fillStyle = kolory[i];
+        canvas_context.fillRect(
+            enemies[i].col * cellSize + margin,
+            enemies[i].row * cellSize + margin,
+            cellSize - margin * 2,
+            cellSize - margin * 2
+        );
+    }
 }
 
 // rysuje gracza
@@ -81,7 +74,7 @@ function drawItems(){
         if(item.collected)continue;
         if(item.type==="heal")canvas_context.drawImage(healImg, item.col * cellSize, item.row * cellSize, cellSize, cellSize);
         else{
-        if(item.type==="key")canvas_context.fillStyle="yelllow";
+        if(item.type==="key")canvas_context.fillStyle="yellow";
         if(item.type==="riddle")canvas_context.fillStyle="cyan";
         canvas_context.beginPath();
         canvas_context.arc(
@@ -102,16 +95,16 @@ function drawGameOver(){
     canvas_context.fillStyle="rgba(0,0,0,0.7)";
     canvas_context.fillRect(0,0,canvas_element.width,canvas_element.height);
 
-    canvas_context.fillStyle="#c0813";
+    canvas_context.fillStyle="#c0813a";
     canvas_context.font="bold 60px Arial";
-    canvas_context.TextAlign="center"
+    canvas_context.textAlign="center"
     canvas_context.fillText("Koniec gry💀💀💀💀", canvas_element.width / 2, canvas_element.height / 2 - 20);
 
     canvas_context.fillStyle="#d4c5a9";
     canvas_context.font="20px Arial";
     canvas_context.fillText("Naciśnij R aby zagrać ponownie", canvas_element.width / 2, canvas_element.height / 2 + 30);
 
-    canvas_context.TextAlign="left"//resetuje by nie psuć reszty
+    canvas_context.textAlign="left"//resetuje by nie psuć reszty
 }
 
 // odświeża ekran
@@ -121,7 +114,6 @@ function render() {
     drawItems();//zawsze pomiedzy maze a palyer 
     drawPlayer();
     drawHP();
-    drawEnemy();
-    drawEnemy2();
+    drawEnemies();
     if(gameOver)drawGameOver();
 }
