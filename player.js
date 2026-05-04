@@ -9,8 +9,10 @@ const traps = [
 ];
 
 // przeciwnicy
-let enemy = { row: 9, col: 20 };
-let enemy2 = { row: 5, col: 22 };
+const enemies = [
+    { row: 9, col: 20 },
+    { row: 5, col: 22 },
+];
 
 // pozycja gracza na siatce
 let playerCol = 1;
