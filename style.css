@@ -73,3 +73,58 @@ body {
 #canvas_gry {
     display: none;
 }
+
+/* nakładka ciemna na cały ekran */
+#riddle-overlay {
+    display: none;
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.75);
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+}
+
+/* pokazuje się przez dodanie klasy active */
+#riddle-overlay.active {
+    display: flex;
+}
+
+/* ramka zagadki */
+#riddle-box {
+    background: #1a1a2e;
+    border: 1px solid #c0813a;
+    padding: 40px;
+    text-align: center;
+}
+
+/* tekst pytania */
+#riddle-question {
+    color: #d4c5a9;
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+}
+
+/* rząd przycisków */
+#riddle-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* pojedynczy przycisk-kolor */
+.riddle-btn {
+    width: 70px;
+    height: 70px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+}
+
+/* hover podświetla obramowanie */
+.riddle-btn:hover {
+    transform: scale(1.1);
+    border-color: #d4c5a9;
+}
