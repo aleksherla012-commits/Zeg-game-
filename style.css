@@ -72,6 +72,8 @@ body {
 
 #canvas_gry {
     display: none;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
 }
 
 /* nakładka ciemna na cały ekran */
