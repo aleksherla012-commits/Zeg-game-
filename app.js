@@ -126,6 +126,13 @@ document.getElementById("btn-continue").addEventListener("click", function() {
     }
 });
 
+//kliknięcie quit opuszcza stronę 
+document.getElementById("btn-quit").addEventListener("click", function() {
+    if (confirm("Czy na pewno chcesz wyjść?")) {
+        window.close();
+    }
+});
+
 // chowa menu i zaczyna grę
 function startGame() {
     document.getElementById("start-screen").style.display = "none";
