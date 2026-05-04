@@ -9,15 +9,26 @@ healImg.src="heart.png";
 
 // rysuje labirynt
 function drawMaze() {
+    if (!riddleSolved) {
+    canvas_context.fillStyle = "cyan";
+    canvas_context.fillRect(24 * cellSize, 17 * cellSize, cellSize, cellSize);
+    }
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             canvas_context.fillStyle = maze[i][j] === 1 ? "black" : "white";
             canvas_context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
         }
     }
+    // blok blokujący wyjście
+    if (!riddleSolved) {
+        canvas_context.fillStyle = "cyan";
+        canvas_context.fillRect(24 * cellSize, 18 * cellSize, cellSize, cellSize);
+    }
+
 // rysuje mete
 canvas_context.fillStyle = "gold";
 canvas_context.fillRect(exit.col * cellSize, exit.row * cellSize, cellSize, cellSize);
+
 // rysuje pułapki
 for (const trap of traps) {
     canvas_context.fillStyle = "red";
