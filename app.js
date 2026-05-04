@@ -109,6 +109,7 @@ if (playerRow === exit.row && playerCol === exit.col) {
     playerRow = 1;
     playerCol = 1;
     riddleSolved = false;
+    for (const item of items) item.collected = false;
 }
     render();
 });
