@@ -113,7 +113,7 @@ render();
 document.getElementById("btn-new").addEventListener("click", startGame);
 
 //kliknięcie continue zaczyna gre od momentu opuszczenia
-document.getElementById("btn-continue").addEventListener("click",function()){
+document.getElementById("btn-continue").addEventListener("click", function() {
     //tylko jeżeli gracz zaczynał już kiedyś gre
     if(score>0 || currentLevel>1){
          document.getElementById("start-screen").style.display = "none";
@@ -124,7 +124,7 @@ document.getElementById("btn-continue").addEventListener("click",function()){
     else{
         alert("nie zapisałeś żadnej gry ")
     }
-}
+});
 
 // chowa menu i zaczyna grę
 function startGame() {
