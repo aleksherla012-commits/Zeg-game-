@@ -4,9 +4,9 @@ const canvas_context = canvas_element.getContext("2d");
 canvas_context.imageSmoothingEnabled = false;
 
 const heartImg = new Image();
-heartImg.src = 'heart.png';
+heartImg.src = 'Assets/heart.png';
 const healImg= new Image();
-healImg.src="heart.png";
+healImg.src="Assets/heart.png";
 
 // obrazki kluczy
 const keyImgs = {
@@ -14,9 +14,9 @@ const keyImgs = {
     2: new Image(),
     3: new Image(),
 };
-keyImgs[1].src = "blue_key.png";
-keyImgs[2].src = "red_key.png";
-keyImgs[3].src = "green_key.png";
+keyImgs[1].src = "Assets/blue_key.png";
+keyImgs[2].src = "Assets/red_key.png";
+keyImgs[3].src = "Assets/green_key.png";
 
 // rysuje labirynt
 function drawMaze() {
