@@ -99,16 +99,116 @@ document.addEventListener("keydown", function (event) {
     render();
 });
 
+// ---- baza zagadek egipskich ----
+const riddleBank = [
+    {
+        question: "Nil podczas wylewu barwił wody na czerwono. Który kolor Egipcjanie czcili jako symbol życia i odrodzenia?",
+        type: "color",
+        answers: [
+            { label: null, color: "#c0392b", value: "czerwony" },
+            { label: null, color: "#1a6b3a", value: "zielony" },
+            { label: null, color: "#1a3a6b", value: "niebieski" },
+            { label: null, color: "#8B4513", value: "brazowy" },
+        ],
+        correct: "czerwony",
+    },
+    {
+        question: "Strażnik bram zaświatów, pół człowiek pół szakal, bóg mumifikacji. Jak brzmi jego imię?",
+        type: "text",
+        answers: [
+            { label: "Ozyrys",  value: "ozyrys"  },
+            { label: "Anubis",  value: "anubis"  },
+            { label: "Horus",   value: "horus"   },
+            { label: "Thot",    value: "thot"    },
+        ],
+        correct: "anubis",
+    },
+    {
+        question: "Ile kanop używano do przechowywania organów wewnętrznych podczas mumifikacji?",
+        type: "text",
+        answers: [
+            { label: "2", value: "2" },
+            { label: "4", value: "4" },
+            { label: "6", value: "6" },
+            { label: "8", value: "8" },
+        ],
+        correct: "4",
+    },
+    {
+        question: "Serce ważono na szali naprzeciwko pióra. Pióro należało do bogini prawdy i sprawiedliwości. Jak miała na imię?",
+        type: "text",
+        answers: [
+            { label: "Izyda",  value: "izyda"  },
+            { label: "Hathor", value: "hathor" },
+            { label: "Maat",   value: "maat"   },
+            { label: "Nut",    value: "nut"    },
+        ],
+        correct: "maat",
+    },
+    {
+        question: "Lapis lazuli był kamieniem nieba i ochrony. Który kolor nosił w sobie moc oka Horusa?",
+        type: "color",
+        answers: [
+            { label: null, color: "gold",    value: "zloty"    },
+            { label: null, color: "#2471a3", value: "niebieski" },
+            { label: null, color: "#27ae60", value: "zielony"  },
+            { label: null, color: "#922b21", value: "czerwony" },
+        ],
+        correct: "niebieski",
+    },
+    {
+        question: "Który faraon jako pierwszy zjednoczył Górny i Dolny Egipt, zakładając pierwszą dynastię?",
+        type: "text",
+        answers: [
+            { label: "Ramzes II",  value: "ramzes"   },
+            { label: "Narmer",     value: "narmer"   },
+            { label: "Tutanchamon",value: "tut"      },
+            { label: "Echanton",   value: "echanton" },
+        ],
+        correct: "narmer",
+    },
+];
+
+// przypisuje konkretną zagadkę do każdego riddleId (per poziom)
+const riddleAssignments = {
+    1: { 1: 0 },
+    2: { 1: 1, 2: 2 },
+    3: { 1: 3, 2: 4, 3: 5 },
+};
+
 // ---- wyświetla zagadkę ----
 function showRiddle(item) {
-    const overlay = document.getElementById("riddle-overlay");
-    overlay.classList.add("active");
+    const overlay  = document.getElementById("riddle-overlay");
+    const question = document.getElementById("riddle-question");
+    const buttons  = document.getElementById("riddle-buttons");
 
-    document.querySelectorAll(".riddle-btn").forEach(btn => {
+    // wybierz zagadkę
+    const idx    = (riddleAssignments[currentLevel] || {})[item.riddleId] ?? 0;
+    const riddle = riddleBank[idx];
+
+    question.textContent = riddle.question;
+
+    // wyczyść stare przyciski
+    buttons.innerHTML = "";
+
+    riddle.answers.forEach(ans => {
+        const btn = document.createElement("button");
+        btn.className = "riddle-btn";
+
+        if (riddle.type === "color") {
+            btn.style.background = ans.color;
+            btn.dataset.answer   = ans.value;
+        } else {
+            // typ tekstowy — inne tło niż GUI zagadki
+            btn.classList.add("riddle-btn-text");
+            btn.textContent    = ans.label;
+            btn.dataset.answer = ans.value;
+        }
+
         btn.onclick = function () {
             overlay.classList.remove("active");
 
-            if (btn.dataset.color === "zloty") {
+            if (btn.dataset.answer === riddle.correct) {
                 playSound(800, 0.4);
                 item.collected = true;
                 riddlesSolved++;
@@ -118,7 +218,6 @@ function showRiddle(item) {
                 playSound(100, 0.3);
                 if (hp <= 0) { gameOver = true; render(); return; }
 
-                // przesuń zagadkę w losowe wolne miejsce (per poziom)
                 const freeSpacesMap = {
                     1: [{ row:1,col:10 },{ row:7,col:4 },{ row:11,col:17 },{ row:15,col:23 }],
                     2: [{ row:1,col:9  },{ row:7,col:7 },{ row:13,col:13 },{ row:17,col:4  }],
@@ -131,7 +230,11 @@ function showRiddle(item) {
             }
             render();
         };
+
+        buttons.appendChild(btn);
     });
+
+    overlay.classList.add("active");
 }
 
 render();
