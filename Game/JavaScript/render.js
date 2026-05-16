@@ -86,8 +86,6 @@ function drawPlayer() {
         cellSize - margin * 2
     );
 }
-//poziom
-let currentLevel=1;
 
 // rysuje HP
 function drawHP() {
