@@ -35,9 +35,14 @@ function drawMaze() {
     canvas_context.fillStyle = "gold";
     canvas_context.fillRect(exit.col * cellSize, exit.row * cellSize, cellSize, cellSize);
 
-    // pułapki
+    // pułapki — ukryte (kolor podłogi) na lvl 3, widoczne (czerwone) na pozostałych
     for (const trap of traps) {
-        canvas_context.fillStyle = "red";
+        if (trap.hidden) {
+            // kolor niemal identyczny z podłogą — ledwo widoczny odcień
+            canvas_context.fillStyle = "#f0f0f0";
+        } else {
+            canvas_context.fillStyle = "red";
+        }
         canvas_context.fillRect(trap.col * cellSize, trap.row * cellSize, cellSize, cellSize);
     }
 
@@ -175,14 +180,35 @@ function drawGameOver() {
     canvas_context.textAlign = "left";
 }
 
+
+// ---- mgła wojny (level 3+): zakrywa komórki dalej niż fogRadius od gracza ----
+function drawFog() {
+    const fogRadius = 4; // widoczność 4 komórek
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+            const dist = Math.abs(i - playerRow) + Math.abs(j - playerCol);
+            if (dist > fogRadius) {
+                // całkowita ciemność — nic nie widać
+                canvas_context.fillStyle = "rgba(0,0,0,1)";
+                canvas_context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            } else if (dist === fogRadius) {
+                // miękka krawędź tylko na granicy zasięgu
+                canvas_context.fillStyle = "rgba(0,0,0,0.6)";
+                canvas_context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            }
+        }
+    }
+}
+
 // ---- główna funkcja render ----
 function render() {
     canvas_context.clearRect(0, 0, canvas_element.width, canvas_element.height);
     drawMaze();
     drawItems();
     drawFireballs();
-    drawPlayer();
-    drawHP();
     drawEnemies();
+    drawPlayer();
+    if (currentLevel >= 3) drawFog();
+    drawHP();
     if (gameOver) drawGameOver();
 }
