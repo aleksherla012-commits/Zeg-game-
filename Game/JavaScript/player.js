@@ -28,7 +28,7 @@ const levelData = {
         ],
         enemies: [
             { row: 19, col: 5  },
-            { row: 1,  col: 19 },
+            { row: 1,  col: 18 },
         ],
         enemyInterval: 500,
         items: [
@@ -73,8 +73,8 @@ const levelData = {
             { row: 9,  col: 17, type: "riddle", collected: false, riddleId: 2 },
         ],
         doors: [
-            { row: 6,  col: 7,  keyId: 1, open: false },
-            { row: 14, col: 17, keyId: 2, open: false },
+            { row: 6,  col: 7,  keyId: 2, open: false },
+            { row: 15, col: 17, keyId: 1, open: false },
         ],
         riddlesRequired: 2,
         // kula startuje na wolnej komorce (row:1,col:5 = 0 w mazeLevel2)
@@ -85,8 +85,49 @@ const levelData = {
               lavaRow: 19, lavaCol: 13 }
         ],
     },
-};
 
+
+    3: {
+        traps: [
+            // pułapki ukryte — kolor podłogi, nie czerwony (hidden:true)
+            { row: 1,  col: 3,  hidden: true },
+            { row: 3,  col: 7,  hidden: true },
+            { row: 5,  col: 10, hidden: true },
+            { row: 7,  col: 5,  hidden: true },
+            { row: 9,  col: 13, hidden: true },
+            { row: 11, col: 20, hidden: true },
+            { row: 13, col: 22, hidden: true },
+            { row: 15, col: 8,  hidden: true },
+            { row: 17, col: 15, hidden: true },
+            { row: 19, col: 4,  hidden: true },
+            { row: 3,  col: 21, hidden: true },
+            { row: 7,  col: 18, hidden: true },
+        ],
+        enemies: [
+            { row: 5,  col: 20 },
+            { row: 9,  col: 1  },
+            { row: 13, col: 5  },
+            { row: 17, col: 9  },
+        ],
+        enemyInterval: 360,
+        items: [
+            { row: 1,  col: 23, type: "heal",   collected: false },
+            { row: 3,  col: 1,  type: "key",    collected: false, keyId: 1 },
+            { row: 7,  col: 5,  type: "key",    collected: false, keyId: 2 },
+            { row: 13, col: 4,  type: "key",    collected: false, keyId: 3 },
+            { row: 1,  col: 20, type: "riddle", collected: false, riddleId: 1 },
+            { row: 3,  col: 19, type: "riddle", collected: false, riddleId: 2 },
+            { row: 7,  col: 18, type: "riddle", collected: false, riddleId: 3 },
+        ],
+        doors: [
+            { row: 4,  col: 3,  keyId: 1, open: false },
+            { row: 10, col: 3,  keyId: 2, open: false },
+            { row: 16, col: 2,  keyId: 3, open: false },
+        ],
+        riddlesRequired: 3,
+        fireballs: [],
+    },
+};
 // aktywne dane (ładowane przez loadLevel)
 let traps    = [];
 let enemies  = [];
@@ -111,6 +152,7 @@ function loadLevel(level) {
     // podmień labirynt
     if (level === 1) maze = mazeLevel1.map(r => [...r]);
     if (level === 2) maze = mazeLevel2.map(r => [...r]);
+    if (level === 3) maze = mazeLevel3.map(r => [...r]);
 
     playerRow = 1;
     playerCol = 1;
