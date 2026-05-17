@@ -7,7 +7,7 @@ document.addEventListener("keydown", function (event) {
 
     if (gameOver) {
         if (event.key === "m" || event.key === "M") {
-            document.getElementById("canvas_gry").style.display = "none";
+            hideCanvas();
             document.getElementById("start-screen").style.display = "flex";
             return;
         }
@@ -317,6 +317,14 @@ function updateLevelCards() {
     });
 }
 
+function showCanvas() {
+    document.getElementById("game-wrapper").style.display = "flex";
+    updateHUD();
+}
+function hideCanvas() {
+    document.getElementById("game-wrapper").style.display = "none";
+}
+
 document.getElementById("btn-new").addEventListener("click", function() {
     document.getElementById("start-screen").style.display = "none";
     document.getElementById("level-select-screen").style.display = "flex";
@@ -333,7 +341,7 @@ document.querySelectorAll(".level-card").forEach(function(card) {
         loadLevel(lvl);
         initEnemies();
         document.getElementById("level-select-screen").style.display = "none";
-        document.getElementById("canvas_gry").style.display = "block";
+        showCanvas();
     });
 });
 
@@ -345,7 +353,7 @@ document.getElementById("btn-level-back").addEventListener("click", function() {
 document.getElementById("btn-continue").addEventListener("click", function () {
     if (score > 0 || currentLevel > 1) {
         document.getElementById("start-screen").style.display = "none";
-        document.getElementById("canvas_gry").style.display  = "block";
+        showCanvas();
         render();
     } else {
         alert("nie zapisales zadnej gry");
@@ -391,7 +399,7 @@ function startGame(lvl) {
     loadLevel(lvl);
     initEnemies();
     document.getElementById("start-screen").style.display = "none";
-    document.getElementById("canvas_gry").style.display  = "block";
+    showCanvas();
 }
 // ---- ekran ukończenia poziomu ----
 const levelNames = {
@@ -441,7 +449,7 @@ document.getElementById("lc-btn-next").addEventListener("click", function() {
 document.getElementById("lc-btn-levels").addEventListener("click", function() {
     document.getElementById("level-complete-overlay").classList.remove("active");
     gamePaused = false;
-    document.getElementById("canvas_gry").style.display = "none";
+    hideCanvas();
     document.getElementById("level-select-screen").style.display = "flex";
     updateLevelCards();
 });
@@ -449,7 +457,7 @@ document.getElementById("lc-btn-levels").addEventListener("click", function() {
 document.getElementById("lc-btn-menu").addEventListener("click", function() {
     document.getElementById("level-complete-overlay").classList.remove("active");
     gamePaused = false;
-    document.getElementById("canvas_gry").style.display = "none";
+    hideCanvas();
     document.getElementById("start-screen").style.display = "flex";
 });
 
