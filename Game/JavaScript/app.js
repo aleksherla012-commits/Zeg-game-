@@ -101,20 +101,7 @@ document.addEventListener("keydown", function (event) {
             playSound(800, 0.5);
             if (highScore === 0 || score < highScore) highScore = score;
 
-            // przejście do kolejnego poziomu
-            if (currentLevel < 4) {
-                unlockLevel(currentLevel + 1);
-                currentLevel++;
-                riddlesSolved = 0;
-                loadLevel(currentLevel);
-                initEnemies();
-            } else {
-                currentLevel = 1;
-                score = 0;
-                riddlesSolved = 0;
-                loadLevel(1);
-                initEnemies();
-            }
+            showLevelComplete();
         } else {
             playSound(100, 0.2);
         }
@@ -403,8 +390,69 @@ function startGame(lvl) {
     document.getElementById("start-screen").style.display = "none";
     document.getElementById("canvas_gry").style.display  = "block";
 }
+// ---- ekran ukończenia poziomu ----
+const levelNames = {
+    1: "PODZIEMIA FARAONA",
+    2: "KOMORY ZAPOMNIANYCH",
+    3: "KRYPTA WIECZNEGO SNU",
+    4: "SANKTUARIUM BOGA RA",
+};
+const levelHieroglyphs = { 1: "𓂀", 2: "𓆏", 3: "𓋹", 4: "𓁹" };
+
+function showLevelComplete() {
+    gamePaused = true;
+
+    // unlock następny poziom
+    if (currentLevel < 4) unlockLevel(currentLevel + 1);
+
+    const overlay = document.getElementById("level-complete-overlay");
+    document.getElementById("lc-level-name").textContent = levelNames[currentLevel] || "POZIOM " + currentLevel;
+    document.querySelector(".lc-hieroglyph").textContent = levelHieroglyphs[currentLevel] || "𓂀";
+    document.getElementById("lc-score").textContent     = score;
+    document.getElementById("lc-highscore").textContent = highScore;
+
+    const btnNext = document.getElementById("lc-btn-next");
+    if (currentLevel >= 4) {
+        btnNext.classList.add("disabled");
+    } else {
+        btnNext.classList.remove("disabled");
+    }
+
+    overlay.classList.add("active");
+}
+
+document.getElementById("lc-btn-next").addEventListener("click", function() {
+    const overlay = document.getElementById("level-complete-overlay");
+    overlay.classList.remove("active");
+    gamePaused = false;
+
+    if (currentLevel < 4) {
+        currentLevel++;
+        score = 0;
+        riddlesSolved = 0;
+        loadLevel(currentLevel);
+        initEnemies();
+    }
+});
+
+document.getElementById("lc-btn-levels").addEventListener("click", function() {
+    document.getElementById("level-complete-overlay").classList.remove("active");
+    gamePaused = false;
+    document.getElementById("canvas_gry").style.display = "none";
+    document.getElementById("level-select-screen").style.display = "flex";
+    updateLevelCards();
+});
+
+document.getElementById("lc-btn-menu").addEventListener("click", function() {
+    document.getElementById("level-complete-overlay").classList.remove("active");
+    gamePaused = false;
+    document.getElementById("canvas_gry").style.display = "none";
+    document.getElementById("start-screen").style.display = "flex";
+});
+
+
 function gameLoop() {
     render();
     requestAnimationFrame(gameLoop);
-}   
+}
 gameLoop();
