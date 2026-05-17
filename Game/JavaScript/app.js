@@ -78,7 +78,7 @@ document.addEventListener("keydown", function (event) {
             if (highScore === 0 || score < highScore) highScore = score;
 
             // przejście do kolejnego poziomu
-            if (currentLevel < 3) {
+            if (currentLevel < 4) {
                 currentLevel++;
                 riddlesSolved = 0;
                 loadLevel(currentLevel);
@@ -167,6 +167,54 @@ const riddleBank = [
         ],
         correct: "narmer",
     },
+    //nowa zagadka dla poziomu 4
+    {
+        question: "Która bogini rozpostarła skrzydła nad sarkofagiem, chroniąc ciało faraona przed złem?",
+        type: "text",
+        answers: [
+            { label: "Izyda",  value: "izyda"  },
+            { label: "Hathor", value: "hathor" },
+            { label: "Maat",   value: "maat"   },
+            { label: "Nut",    value: "nut"    },
+        ],
+        correct: "izyda",
+    },
+    {
+        question:"Ile lat trwała budowa Wielkiej Piramidy w Gizie, grobowca faraona Cheopsa?",
+        type: "text",
+        answers: [
+            { label: "10", value: "10" },
+            { label: "20", value: "20" },
+            { label: "30", value: "30" },
+            { label: "40", value: "40" },
+        ],
+        correct: "20",
+    },
+    {
+        question: "kolor ochrony przed złem-kolor skarabeuszy i amuletów zycia",
+        type: "color",
+        answers: [
+            { label: null, color: "gold",    value: "zloty"    },
+            { label: null, color: "#2471a3", value: "niebieski" },
+            { label: null, color: "#27ae60", value: "zielony"  },
+            { label: null, color: "#922b21", value: "czerwony" },
+        ],
+        correct: "zielony",
+          
+    },
+    {
+        question: "Starożytni Egipcjani wierzyli, że dusza skałada sie z 5 części.Która z nich była 'siłą życiową' człowieka ",
+        type: "text",
+        answers: [
+            { label: "Ka", value: "ka" },
+            { label: "Ba", value: "ba" },
+            { label: "Akh", value: "akh" },
+            { label: "Ren", value: "ren" },
+        ],
+        correct: "ka",
+
+        
+    },
 ];
 
 // przypisuje konkretną zagadkę do każdego riddleId (per poziom)
@@ -174,6 +222,7 @@ const riddleAssignments = {
     1: { 1: 0 },
     2: { 1: 1, 2: 2 },
     3: { 1: 3, 2: 4, 3: 5 },
+    4: { 1: 6, 2: 7, 3: 8, 4: 9 },
 };
 
 // ---- wyświetla zagadkę ----

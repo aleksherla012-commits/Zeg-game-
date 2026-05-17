@@ -182,8 +182,8 @@ function drawGameOver() {
 
 
 // ---- mgła wojny (level 3+): zakrywa komórki dalej niż fogRadius od gracza ----
-function drawFog() {
-    const fogRadius = 4; // widoczność 4 komórek
+function drawFog(fogRadius) {
+   
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             const dist = Math.abs(i - playerRow) + Math.abs(j - playerCol);
@@ -208,7 +208,8 @@ function render() {
     drawFireballs();
     drawEnemies();
     drawPlayer();
-    if (currentLevel >= 3) drawFog();
+    if (currentLevel == 3) drawFog(4);
+    if (currentLevel == 4) drawFog(2);
     drawHP();
     if (gameOver) drawGameOver();
 }

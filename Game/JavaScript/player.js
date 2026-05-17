@@ -127,6 +127,54 @@ const levelData = {
         riddlesRequired: 3,
         fireballs: [],
     },
+    4: {
+        traps: [
+            {row:1, col:5, hidden: true},
+            {row:3, col:9, hidden: true},
+            {row:5, col:12, hidden: true},
+            {row:7, col:3, hidden: true},
+            {row:9, col:17, hidden: true},
+            {row:11, col:6, hidden: true},
+            {row:13, col:20, hidden: true},
+            {row:15, col:4, hidden: true},
+            {row:17, col:11, hidden: true},
+            {row:19, col:8, hidden: true},
+            {row:3, col:22, hidden: true},
+            {row:7, col:15, hidden: true},
+            {row:11, col:23, hidden: true},
+            {row:15, col:19, hidden: true},
+    ],
+        enemies: [
+            {row:1, col:22},
+            {row:5, col:1},
+            {row:9, col:11},
+            {row:13, col:7},
+            {row:17, col:20},
+        ],
+        enemyInterval: 300,
+        items: [
+            {row:19, col:1, type:"heal", collected:false},
+            {row:3, col:3, type:"key", collected:false, keyId:1},
+            {row:7, col:11, type:"key", collected:false, keyId:2},
+            {row:13, col:17, type:"key", collected:false, keyId:3},
+            {row:1, col:18, type:"riddle", collected:false, riddleId:1},
+            {row:5, col:7, type:"riddle", collected:false, riddleId:2},
+            {row:11, col:3, type:"riddle", collected:false, riddleId:3},
+            {row:17, col:5, type:"riddle", collected:false, riddleId:4},
+        ],
+        doors: [
+            {row:4, col:3, keyId:1, open:false},
+            {row:10, col:7, keyId:2, open:false},
+            {row:16, col:17, keyId:3, open:false},
+        ],
+        riddlesRequired: 4,
+        fireballs: [
+            { row: 19, col: 22, active: true, chaseSteps: 0, maxChase: 9,
+                falling: false, fallProgress: 0, respawnTicks: 0,
+                lavaRow: 19, lavaCol: 13 }
+        ],
+    },
+
 };
 // aktywne dane (ładowane przez loadLevel)
 let traps    = [];
@@ -153,6 +201,7 @@ function loadLevel(level) {
     if (level === 1) maze = mazeLevel1.map(r => [...r]);
     if (level === 2) maze = mazeLevel2.map(r => [...r]);
     if (level === 3) maze = mazeLevel3.map(r => [...r]);
+    if (level === 4) maze = mazeLevel4.map(r => [...r]);
 
     playerRow = 1;
     playerCol = 1;
