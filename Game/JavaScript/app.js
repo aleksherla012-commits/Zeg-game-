@@ -103,6 +103,7 @@ document.addEventListener("keydown", function (event) {
 
             // przejście do kolejnego poziomu
             if (currentLevel < 4) {
+                unlockLevel(currentLevel + 1);
                 currentLevel++;
                 riddlesSolved = 0;
                 loadLevel(currentLevel);
@@ -306,7 +307,53 @@ function showRiddle(item) {
 }
 
 
-document.getElementById("btn-new").addEventListener("click", startGame);
+// ---- poziomy odblokowane (zapisane w localStorage) ----
+function getUnlockedLevels() {
+    try { return JSON.parse(localStorage.getItem("veilUnlocked") || "[1]"); } catch(e) { return [1]; }
+}
+function unlockLevel(n) {
+    const ul = getUnlockedLevels();
+    if (!ul.includes(n)) { ul.push(n); localStorage.setItem("veilUnlocked", JSON.stringify(ul)); }
+}
+function updateLevelCards() {
+    const ul = getUnlockedLevels();
+    document.querySelectorAll(".level-card").forEach(function(card) {
+        const lvl = parseInt(card.dataset.level);
+        if (ul.includes(lvl)) {
+            card.classList.remove("locked");
+            card.classList.add("unlocked");
+            const req = card.querySelector(".level-req");
+            if (req) req.remove();
+            const lock = card.querySelector(".level-lock");
+            if (lock) lock.remove();
+        }
+    });
+}
+
+document.getElementById("btn-new").addEventListener("click", function() {
+    document.getElementById("start-screen").style.display = "none";
+    document.getElementById("level-select-screen").style.display = "flex";
+    updateLevelCards();
+});
+
+document.querySelectorAll(".level-card").forEach(function(card) {
+    card.addEventListener("click", function() {
+        if (!card.classList.contains("unlocked")) return;
+        const lvl = parseInt(card.dataset.level);
+        currentLevel = lvl;
+        score = 0;
+        riddlesSolved = 0;
+        loadLevel(lvl);
+        initEnemies();
+        document.getElementById("level-select-screen").style.display = "none";
+        document.getElementById("canvas_gry").style.display = "block";
+    });
+});
+
+document.getElementById("btn-level-back").addEventListener("click", function() {
+    document.getElementById("level-select-screen").style.display = "none";
+    document.getElementById("start-screen").style.display = "flex";
+});
 
 document.getElementById("btn-continue").addEventListener("click", function () {
     if (score > 0 || currentLevel > 1) {
@@ -346,15 +393,15 @@ document.getElementById("btn-quit").addEventListener("click", function () {
     if (confirm("Czy na pewno chcesz wyjsc?")) window.close();
 });
 
-function startGame() {
-    currentLevel  = 1;
+function startGame(lvl) {
+    lvl = lvl || 1;
+    currentLevel  = lvl;
     score         = 0;
     riddlesSolved = 0;
-    loadLevel(1);
+    loadLevel(lvl);
     initEnemies();
     document.getElementById("start-screen").style.display = "none";
     document.getElementById("canvas_gry").style.display  = "block";
-    
 }
 function gameLoop() {
     render();
