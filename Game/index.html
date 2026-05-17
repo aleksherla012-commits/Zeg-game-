@@ -112,7 +112,56 @@
 </div>
 
     <!-- gra -->
-    <canvas id="canvas_gry" width="780" height="670"></canvas>
+    <div id="game-wrapper">
+        <canvas id="canvas_gry" width="780" height="630"></canvas>
+
+        <!-- HUD po prawej -->
+        <div id="hud">
+            <div class="hud-section" id="hud-hp">
+                <div class="hud-label">ŻYCIA</div>
+                <div class="hud-hearts">
+                    <img class="hud-heart" id="heart-0" src="Assets/heart.png">
+                    <img class="hud-heart" id="heart-1" src="Assets/heart.png">
+                    <img class="hud-heart" id="heart-2" src="Assets/heart.png">
+                </div>
+            </div>
+
+            <div class="hud-divider"></div>
+
+            <div class="hud-section">
+                <div class="hud-label">KLUCZE</div>
+                <div class="hud-keys" id="hud-keys"></div>
+            </div>
+
+            <div class="hud-divider"></div>
+
+            <div class="hud-section">
+                <div class="hud-label">ZAGADKI</div>
+                <div class="hud-riddles" id="hud-riddles"></div>
+            </div>
+
+            <div class="hud-divider"></div>
+
+            <div class="hud-section">
+                <div class="hud-label">WYNIK</div>
+                <div class="hud-value" id="hud-score">0</div>
+            </div>
+
+            <div class="hud-divider"></div>
+
+            <div class="hud-section">
+                <div class="hud-label">REKORD</div>
+                <div class="hud-value" id="hud-highscore">0</div>
+            </div>
+
+            <div class="hud-divider"></div>
+
+            <div class="hud-section">
+                <div class="hud-label">POZIOM</div>
+                <div class="hud-value hud-level" id="hud-level">1</div>
+            </div>
+        </div>
+    </div>
     <script src="JavaScript/sounds.js"></script>
     <script src="JavaScript/maze.js"></script>
     <script src="JavaScript/player.js"></script>
