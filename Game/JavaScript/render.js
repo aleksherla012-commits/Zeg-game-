@@ -111,6 +111,8 @@ function drawEnemies() {
 
 // ---- rysuje gracza ----
 function drawPlayer() {
+    playerPixelX += (playerTargetPixelX - playerPixelX) * animSpeed;
+    playerPixelY += (playerTargetPixelY - playerPixelY) * animSpeed;
     const margin = 5;
     canvas_context.fillStyle = "blue";
     canvas_context.fillRect(
