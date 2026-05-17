@@ -205,6 +205,10 @@ function loadLevel(level) {
 
     playerRow = 1;
     playerCol = 1;
+    playerPixelX = 1 * cellSize;
+    playerPixelY = 1 * cellSize;
+    playerTargetPixelX = 1 * cellSize;
+    playerTargetPixelY = 1 * cellSize;
     hp        = 3;
     riddleSolved = false;
     gameOver     = false;

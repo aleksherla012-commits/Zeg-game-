@@ -3,6 +3,7 @@ document.addEventListener("keydown", function (event) {
     let newRow = playerRow;
     let newCol = playerCol;
 
+
     // restart po game over
     if (gameOver) {
         if (event.key === "r" || event.key === "R") {
@@ -29,6 +30,8 @@ document.addEventListener("keydown", function (event) {
             blockedDoor.open = true;
             playerRow = newRow;
             playerCol = newCol;
+            playerTargetPixelX = newCol * cellSize;
+            playerTargetPixelY = newRow * cellSize;
             playSound(500, 0.3);
             score++;
         } else {
