@@ -28,7 +28,7 @@ function initEnemies() {
                 hp--;
                 playSound(100, 0.2);
                 if (hp <= 0) {
-                    gameOver = true;
+                    setDeath("enemy");
                 }
             }
         }
@@ -87,10 +87,10 @@ function updateFireballs() {
 
             // uderza gracza?
             if (fb.row === playerRow && fb.col === playerCol) {
-                hp -= 2; // kula — zabiera 2 serca
+                hp -= 2;
                 if (hp < 0) hp = 0;
                 playSound(120, 0.4);
-                if (hp <= 0) gameOver = true;
+                if (hp <= 0) setDeath("ball");
                 fb.falling      = true;
                 fb.fallProgress = 0;
             }
@@ -98,14 +98,6 @@ function updateFireballs() {
             // dojechala do lavy — wpada
             fb.falling      = true;
             fb.fallProgress = 0;
-        }
-
-        // gracz stoi na polu lawy — zabiera 3 serca
-        if (playerRow === fb.lavaRow && playerCol === fb.lavaCol) {
-            hp -= 3;
-            if (hp < 0) hp = 0;
-            playSound(80, 0.5);
-            if (hp <= 0) gameOver = true;
         }
     }
 }
