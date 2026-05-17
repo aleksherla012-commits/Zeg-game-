@@ -3,6 +3,7 @@
 body {
     background: #0a0a0f;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
@@ -70,11 +71,172 @@ body {
     color: #d4c5a9;
 }
 
-#canvas_gry {
+#game-wrapper {
     display: none;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+#canvas_gry {
+    display: block;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
+    flex-shrink: 0;
 }
+
+/* ===== HUD (pionowy, po prawej) ===== */
+#hud {
+    width: 110px;
+    background: #0d0d1e;
+    border: 1px solid #1e1e35;
+    border-left: 1px solid #c0813a33;
+    padding: 18px 10px;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    flex-shrink: 0;
+    display: flex;
+}
+
+.hud-divider {
+    width: 60%;
+    height: 1px;
+    background: #1e1e35;
+    margin: 14px 0;
+    flex-shrink: 0;
+}
+
+.hud-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.hud-label {
+    font-size: 7px;
+    letter-spacing: 2px;
+    color: #4a3f30;
+    font-weight: 700;
+    text-align: center;
+}
+
+.hud-value {
+    font-size: 22px;
+    font-weight: 200;
+    color: #c0813a;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.hud-level {
+    font-size: 28px;
+}
+
+/* serca — obrazki */
+.hud-hearts {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+}
+
+.hud-heart {
+    width: 28px;
+    height: 28px;
+    image-rendering: pixelated;
+    opacity: 0.15;
+    transition: opacity 0.2s, filter 0.2s;
+    filter: grayscale(1);
+}
+
+.hud-heart.active {
+    opacity: 1;
+    filter: grayscale(0) drop-shadow(0 0 5px #c0392b88);
+}
+
+/* klucze w HUD */
+.hud-keys {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+}
+
+.hud-key-slot {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #1a1a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.hud-key-slot.collected {
+    border-color: #c0813a66;
+    background: #c0813a11;
+    animation: key-pop 0.35s cubic-bezier(.22,.68,0,1.4);
+}
+
+@keyframes key-pop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.35); }
+    100% { transform: scale(1); }
+}
+
+.hud-key-slot img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    opacity: 0.18;
+    transition: opacity 0.2s;
+    image-rendering: pixelated;
+    filter: grayscale(1);
+}
+
+.hud-key-slot.collected img {
+    opacity: 1;
+    filter: grayscale(0);
+}
+
+/* zagadki w HUD */
+.hud-riddles {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+}
+
+.hud-riddle-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid #2a2a3a;
+    background: transparent;
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.hud-riddle-dot.solved {
+    background: #00bcd4;
+    border-color: #00bcd4;
+    box-shadow: 0 0 7px #00bcd488;
+    animation: riddle-pop 0.4s cubic-bezier(.22,.68,0,1.4);
+}
+
+.hud-riddle-dot.needed {
+    border-color: #c0813a55;
+}
+
+@keyframes riddle-pop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.6); }
+    100% { transform: scale(1); }
+}
+
+
 
 /* nakładka ciemna na cały ekran */
 #riddle-overlay {
