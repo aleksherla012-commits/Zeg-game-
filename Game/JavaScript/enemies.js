@@ -32,10 +32,10 @@ function initEnemies() {
                 }
             }
         }
-        lavaFrame = (lavaFrame + 1) % 4;
+
         // ---- logika kuli-pułapki (tylko level 2) ----
+        lavaFrame = (lavaFrame + 1) % 4;
         updateFireballs();
-        
 
         
     }, enemyIntervalMs);
@@ -87,7 +87,7 @@ function updateFireballs() {
 
             // uderza gracza?
             if (fb.row === playerRow && fb.col === playerCol) {
-                hp -= 3; // orange square — zabiera 3 serca
+                hp -= 2; // kula — zabiera 2 serca
                 if (hp < 0) hp = 0;
                 playSound(120, 0.4);
                 if (hp <= 0) gameOver = true;
@@ -98,6 +98,14 @@ function updateFireballs() {
             // dojechala do lavy — wpada
             fb.falling      = true;
             fb.fallProgress = 0;
+        }
+
+        // gracz stoi na polu lawy — zabiera 3 serca
+        if (playerRow === fb.lavaRow && playerCol === fb.lavaCol) {
+            hp -= 3;
+            if (hp < 0) hp = 0;
+            playSound(80, 0.5);
+            if (hp <= 0) gameOver = true;
         }
     }
 }
