@@ -3,7 +3,6 @@ document.addEventListener("keydown", function (event) {
     let newRow = playerRow;
     let newCol = playerCol;
 
-    // restart po game over
     if (gameOver) {
         if (event.key === "r" || event.key === "R") {
             currentLevel = 1;
@@ -16,12 +15,13 @@ document.addEventListener("keydown", function (event) {
         return;
     }
 
+    if (gamePaused) return;
+
     if (event.key === "w" || event.key === "ArrowUp")    newRow--;
     if (event.key === "s" || event.key === "ArrowDown")  newRow++;
     if (event.key === "a" || event.key === "ArrowLeft")  newCol--;
     if (event.key === "d" || event.key === "ArrowRight") newCol++;
 
-    // sprawdź drzwi
     const blockedDoor = doors.find(d => !d.open && d.row === newRow && d.col === newCol);
     if (blockedDoor) {
         const matchingKey = items.find(i => i.type === "key" && i.keyId === blockedDoor.keyId && i.collected);
@@ -41,28 +41,23 @@ document.addEventListener("keydown", function (event) {
         score++;
     }
 
-    // przedmioty
     for (const item of items) {
         if (!item.collected && playerRow === item.row && playerCol === item.col) {
-
             if (item.type === "heal") {
                 if (hp < 3) hp++;
                 playSound(600, 0.3);
                 item.collected = true;
             }
-
             if (item.type === "key") {
                 playSound(500, 0.2);
                 item.collected = true;
             }
-
             if (item.type === "riddle") {
                 showRiddle(item);
             }
         }
     }
 
-    // pułapki
     for (const trap of traps) {
         if (playerRow === trap.row && playerCol === trap.col) {
             hp--;
@@ -71,20 +66,16 @@ document.addEventListener("keydown", function (event) {
         }
     }
 
-    // meta
     if (playerRow === exit.row && playerCol === exit.col) {
         if (riddleSolved) {
             playSound(800, 0.5);
             if (highScore === 0 || score < highScore) highScore = score;
-
-            // przejście do kolejnego poziomu
             if (currentLevel < 3) {
                 currentLevel++;
                 riddlesSolved = 0;
                 loadLevel(currentLevel);
                 initEnemies();
             } else {
-                // ukończyłeś ostatni poziom (na razie level 3) — reset do 1
                 currentLevel = 1;
                 score = 0;
                 riddlesSolved = 0;
@@ -102,29 +93,29 @@ document.addEventListener("keydown", function (event) {
 // ---- baza zagadek egipskich ----
 const riddleBank = [
     {
-        question: "Nil podczas wylewu barwił wody na czerwono. Który kolor Egipcjanie czcili jako symbol życia i odrodzenia?",
+        question: "Nil podczas wylewu barwil wody na czerwono. Ktory kolor Egipcjanie czcili jako symbol zycia i odrodzenia?",
         type: "color",
         answers: [
-            { label: null, color: "#c0392b", value: "czerwony" },
-            { label: null, color: "#1a6b3a", value: "zielony" },
-            { label: null, color: "#1a3a6b", value: "niebieski" },
-            { label: null, color: "#8B4513", value: "brazowy" },
+            { color: "#c0392b", value: "czerwony" },
+            { color: "#1a6b3a", value: "zielony"  },
+            { color: "#1a3a6b", value: "niebieski" },
+            { color: "#8B4513", value: "brazowy"   },
         ],
         correct: "czerwony",
     },
     {
-        question: "Strażnik bram zaświatów, pół człowiek pół szakal, bóg mumifikacji. Jak brzmi jego imię?",
+        question: "Straznik bram zaswiatow — pol czlowiek, pol szakal. Jak brzmi imie boga mumifikacji?",
         type: "text",
         answers: [
-            { label: "Ozyrys",  value: "ozyrys"  },
-            { label: "Anubis",  value: "anubis"  },
-            { label: "Horus",   value: "horus"   },
-            { label: "Thot",    value: "thot"    },
+            { label: "Ozyrys", value: "ozyrys" },
+            { label: "Anubis", value: "anubis" },
+            { label: "Horus",  value: "horus"  },
+            { label: "Thot",   value: "thot"   },
         ],
         correct: "anubis",
     },
     {
-        question: "Ile kanop używano do przechowywania organów wewnętrznych podczas mumifikacji?",
+        question: "Ile kanop uzywano do przechowywania organow wewnetrznych podczas mumifikacji?",
         type: "text",
         answers: [
             { label: "2", value: "2" },
@@ -135,63 +126,58 @@ const riddleBank = [
         correct: "4",
     },
     {
-        question: "Serce ważono na szali naprzeciwko pióra. Pióro należało do bogini prawdy i sprawiedliwości. Jak miała na imię?",
+        question: "Serce wazono na szali naprzeciwko piora bogini prawdy i sprawiedliwosci. Jak miala na imie?",
         type: "text",
         answers: [
             { label: "Izyda",  value: "izyda"  },
             { label: "Hathor", value: "hathor" },
             { label: "Maat",   value: "maat"   },
-            { label: "Nut",    value: "nut"    },
+            { label: "Nut",    value: "nut"     },
         ],
         correct: "maat",
     },
     {
-        question: "Lapis lazuli był kamieniem nieba i ochrony. Który kolor nosił w sobie moc oka Horusa?",
+        question: "Lapis lazuli byl kamieniem nieba i ochrony. Ktory kolor nosil w sobie moc oka Horusa?",
         type: "color",
         answers: [
-            { label: null, color: "gold",    value: "zloty"    },
-            { label: null, color: "#2471a3", value: "niebieski" },
-            { label: null, color: "#27ae60", value: "zielony"  },
-            { label: null, color: "#922b21", value: "czerwony" },
+            { color: "gold",    value: "zloty"    },
+            { color: "#2471a3", value: "niebieski" },
+            { color: "#27ae60", value: "zielony"   },
+            { color: "#922b21", value: "czerwony"  },
         ],
         correct: "niebieski",
     },
     {
-        question: "Który faraon jako pierwszy zjednoczył Górny i Dolny Egipt, zakładając pierwszą dynastię?",
+        question: "Ktory faraon jako pierwszy zjednoczy Gorny i Dolny Egipt, zakladajac pierwsza dynastie?",
         type: "text",
         answers: [
-            { label: "Ramzes II",  value: "ramzes"   },
-            { label: "Narmer",     value: "narmer"   },
-            { label: "Tutanchamon",value: "tut"      },
-            { label: "Echanton",   value: "echanton" },
+            { label: "Ramzes II",   value: "ramzes"   },
+            { label: "Narmer",      value: "narmer"   },
+            { label: "Tutanchamon", value: "tut"      },
+            { label: "Echanton",    value: "echanton" },
         ],
         correct: "narmer",
     },
 ];
 
-// przypisuje konkretną zagadkę do każdego riddleId (per poziom)
 const riddleAssignments = {
     1: { 1: 0 },
     2: { 1: 1, 2: 2 },
     3: { 1: 3, 2: 4, 3: 5 },
 };
 
-// ---- wyświetla zagadkę ----
 function showRiddle(item) {
     const overlay  = document.getElementById("riddle-overlay");
     const question = document.getElementById("riddle-question");
     const buttons  = document.getElementById("riddle-buttons");
 
-    // wybierz zagadkę
     const idx    = (riddleAssignments[currentLevel] || {})[item.riddleId] ?? 0;
     const riddle = riddleBank[idx];
 
     question.textContent = riddle.question;
-
-    // wyczyść stare przyciski
     buttons.innerHTML = "";
 
-    riddle.answers.forEach(ans => {
+    riddle.answers.forEach(function(ans) {
         const btn = document.createElement("button");
         btn.className = "riddle-btn";
 
@@ -199,7 +185,6 @@ function showRiddle(item) {
             btn.style.background = ans.color;
             btn.dataset.answer   = ans.value;
         } else {
-            // typ tekstowy — inne tło niż GUI zagadki
             btn.classList.add("riddle-btn-text");
             btn.textContent    = ans.label;
             btn.dataset.answer = ans.value;
@@ -207,6 +192,7 @@ function showRiddle(item) {
 
         btn.onclick = function () {
             overlay.classList.remove("active");
+            gamePaused = false;
 
             if (btn.dataset.answer === riddle.correct) {
                 playSound(800, 0.4);
@@ -234,12 +220,12 @@ function showRiddle(item) {
         buttons.appendChild(btn);
     });
 
+    gamePaused = true;
     overlay.classList.add("active");
 }
 
 render();
 
-// ---- przyciski menu ----
 document.getElementById("btn-new").addEventListener("click", startGame);
 
 document.getElementById("btn-continue").addEventListener("click", function () {
@@ -248,12 +234,12 @@ document.getElementById("btn-continue").addEventListener("click", function () {
         document.getElementById("canvas_gry").style.display  = "block";
         render();
     } else {
-        alert("nie zapisałeś żadnej gry");
+        alert("nie zapisales zadnej gry");
     }
 });
 
 document.getElementById("btn-quit").addEventListener("click", function () {
-    if (confirm("Czy na pewno chcesz wyjść?")) window.close();
+    if (confirm("Czy na pewno chcesz wyjsc?")) window.close();
 });
 
 function startGame() {
