@@ -32,9 +32,10 @@ function initEnemies() {
                 }
             }
         }
-
+        lavaFrame = (lavaFrame + 1) % 4;
         // ---- logika kuli-pułapki (tylko level 2) ----
         updateFireballs();
+        
 
         
     }, enemyIntervalMs);
