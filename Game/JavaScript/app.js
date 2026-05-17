@@ -78,7 +78,7 @@ document.addEventListener("keydown", function (event) {
             if (highScore === 0 || score < highScore) highScore = score;
 
             // przejście do kolejnego poziomu
-            if (currentLevel < 3) {
+            if (currentLevel < 4) {
                 currentLevel++;
                 riddlesSolved = 0;
                 loadLevel(currentLevel);
@@ -303,14 +303,14 @@ document.getElementById("btn-settings").addEventListener("click", function () {
 //przycisk mute
 document.getElementById("btn-mute").addEventListener("click", function () {
     isMuted = !isMuted;
-    his.innerHTML = isMuted
+    this.innerHTML = isMuted
         ? "Dźwięk: WYŁ <span>🔇</span>"
         : "Dźwięk: WŁ <span>🔊</span>";
 });
 //przycisk jezyk
 document.getElementById("btn-lang").addEventListener("click", function () {
     currentLang = currentLang === "PL" ? "EN" : "PL";
-    this.innerHTML ='Język: ${currentLang} <span>🌐</span>';
+    this.innerHTML = `Język: ${currentLang} <span>🌐</span>`;
 });
 //powrót do menu
 document.getElementById("btn-back").addEventListener("click", function () {

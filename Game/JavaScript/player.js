@@ -224,4 +224,4 @@ let playerTargetX=1*cellSize;
 let playerTargetY=1*cellSize;
 const animSpeed = 0.3; // 0.0-1.0, im wyżej tym szybszy ruch 
 
-let riddlesSolved = 0;let gamePaused = false;
+let gamePaused = false;
