@@ -166,18 +166,6 @@ function drawPlayer() {
 }
 
 
-// ---- rysuje HP i statystyki ----
-function drawHP() {
-    for (let i = 0; i < hp; i++) {
-        canvas_context.drawImage(heartImg, 10 + i * 35, canvas_element.height - 30, 25, 25);
-    }
-    canvas_context.fillStyle = "black";
-    canvas_context.font = "bold 20px Arial";
-    canvas_context.fillText("Wynik: "  + score,        150, canvas_element.height - 10);
-    canvas_context.fillText("Rekord: " + highScore,    350, canvas_element.height - 10);
-    canvas_context.fillText("Poziom: " + currentLevel, 690, canvas_element.height - 10);
-}
-
 // ---- rysuje przedmioty ----
 function drawItems() {
     for (const item of items) {
@@ -197,15 +185,6 @@ function drawItems() {
             canvas_context.fill();
         }
     }
-
-    // status zagadek
-    const solved   = riddlesSolved;
-    const required = riddlesRequired;
-    const done     = solved >= required;
-    const status   = done ? "Wyjscie otwarte" : "Zagadki: " + solved + "/" + required;
-    canvas_context.fillStyle = done ? "lime" : "red";
-    canvas_context.font      = "bold 20px Arial";
-    canvas_context.fillText(status, 490, canvas_element.height - 10);
 }
 
 // ---- baza komunikatów śmierci per przyczyna ----
@@ -321,8 +300,78 @@ function render() {
     drawPlayer();
     if (currentLevel == 3) drawFog(4);
     if (currentLevel == 4) drawFog(2);
-    drawHP();
     if (gameOver) drawGameOver();
+    updateHUD();
+}
+
+// ---- aktualizuje HTML HUD ----
+function updateHUD() {
+    // Serca
+    for (let i = 0; i < 3; i++) {
+        const h = document.getElementById("heart-" + i);
+        if (!h) continue;
+        if (i < hp) h.classList.add("active");
+        else        h.classList.remove("active");
+    }
+
+    // Wynik / Rekord / Poziom
+    const scoreEl = document.getElementById("hud-score");
+    const hsEl    = document.getElementById("hud-highscore");
+    const lvlEl   = document.getElementById("hud-level");
+    if (scoreEl) scoreEl.textContent = score;
+    if (hsEl)    hsEl.textContent    = highScore;
+    if (lvlEl)   lvlEl.textContent   = currentLevel;
+
+    // Klucze
+    const keysEl = document.getElementById("hud-keys");
+    if (keysEl) {
+        const keyItems = items.filter(i => i.type === "key");
+        // odbuduj tylko jeśli liczba slotów się zmieniła
+        if (keysEl.children.length !== keyItems.length) {
+            keysEl.innerHTML = "";
+            keyItems.forEach(function(item) {
+                const slot = document.createElement("div");
+                slot.className = "hud-key-slot";
+                slot.dataset.keyId = item.keyId;
+                const img = document.createElement("img");
+                const srcs = { 1: "Assets/blue_key.png", 2: "Assets/red_key.png", 3: "Assets/green_key.png" };
+                img.src = srcs[item.keyId] || "Assets/blue_key.png";
+                slot.appendChild(img);
+                keysEl.appendChild(slot);
+            });
+        }
+        // aktualizuj zebrane
+        keyItems.forEach(function(item) {
+            const slot = keysEl.querySelector("[data-key-id='" + item.keyId + "']");
+            if (!slot) return;
+            const wasCollected = slot.classList.contains("collected");
+            if (item.collected && !wasCollected) {
+                slot.classList.add("collected");
+            } else if (item.collected) {
+                slot.classList.add("collected");
+            } else {
+                slot.classList.remove("collected");
+            }
+        });
+    }
+
+    // Zagadki
+    const riddlesEl = document.getElementById("hud-riddles");
+    if (riddlesEl) {
+        if (riddlesEl.children.length !== riddlesRequired) {
+            riddlesEl.innerHTML = "";
+            for (let i = 0; i < riddlesRequired; i++) {
+                const dot = document.createElement("div");
+                dot.className = "hud-riddle-dot needed";
+                riddlesEl.appendChild(dot);
+            }
+        }
+        const dots = riddlesEl.querySelectorAll(".hud-riddle-dot");
+        dots.forEach(function(dot, i) {
+            if (i < riddlesSolved) dot.classList.add("solved");
+            else                   dot.classList.remove("solved");
+        });
+    }
 }
 let isMuted = false;
 let currentLang="PL";
