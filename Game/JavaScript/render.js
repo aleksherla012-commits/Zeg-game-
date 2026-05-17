@@ -208,19 +208,86 @@ function drawItems() {
     canvas_context.fillText(status, 490, canvas_element.height - 10);
 }
 
+// ---- baza komunikatów śmierci per przyczyna ----
+const deathMessages = {
+    trap: [
+        "Egipski architekt mial poczucie humoru.",
+        "Podloga byla bardziej wroga niz wrogowie.",
+        "Archeolog znalazl pulapke. Osobiscie.",
+        "To nie byl skrot. Sprawdzone.",
+    ],
+    enemy: [
+        "Faraon nie lubil nieproszonych gosci.",
+        "Straz grobowca byla nieprzekupna.",
+        "Anubis nie czekal na zaproszenie.",
+        "Nastepnym razem moze ominij straznika.",
+    ],
+    ball: [
+        "Kula nie pyta o imie.",
+        "Nie ten korytarz. Zdecydowanie nie ten.",
+        "Toczace sie kamienie zbieraja ofiary.",
+        "Budowniczowie piramid wiedzieli co robia.",
+    ],
+    lava: [
+        "Nil tutaj nie plynie. Sprawdzone.",
+        "Gorace jak w Dolinie Krolow. Dosłownie.",
+        "Ra wyslal pozdrowienia. Bardzo gorace.",
+        "Moze nastepnym razem nie stawaj w lawie.",
+    ],
+    riddle: [
+        "Maat zazyla serce. Bylo za ciezkie.",
+        "Sfinks byl bardziej milosierny.",
+        "Wiedza to potega. Brak wiedzy — smierc.",
+        "Zagadka wygrala. Tym razem.",
+    ],
+};
+
+const deathCauseLabels = {
+    trap:   "ZGINALЕС OD PULAPKI",
+    enemy:  "ZGINALЕС OD STRAZNIKA GROBOWCA",
+    ball:   "ZGINALЕС OD KULI",
+    lava:   "WSTAPILES W LAWE",
+    riddle: "ZAGADKA POCHLONELA TWOJE ZYCIE",
+};
+
 // ---- ekran koncowy ----
 function drawGameOver() {
-    canvas_context.fillStyle = "rgba(0,0,0,0.7)";
+    canvas_context.fillStyle = "rgba(0,0,0,0.75)";
     canvas_context.fillRect(0, 0, canvas_element.width, canvas_element.height);
 
-    canvas_context.fillStyle   = "#c0813a";
-    canvas_context.font        = "bold 60px Arial";
-    canvas_context.textAlign   = "center";
-    canvas_context.fillText("Koniec gry", canvas_element.width / 2, canvas_element.height / 2 - 20);
+    const cx = canvas_element.width  / 2;
+    const cy = canvas_element.height / 2;
 
+    const bw = 560, bh = 180;
+    const bx = cx - bw / 2;
+    const by = cy - bh / 2;
+
+    canvas_context.fillStyle = "#1a1a2e";
+    canvas_context.fillRect(bx, by, bw, bh);
+    canvas_context.strokeStyle = "#c0813a";
+    canvas_context.lineWidth   = 1;
+    canvas_context.strokeRect(bx, by, bw, bh);
+
+    canvas_context.textAlign = "center";
+
+    canvas_context.fillStyle = "#c0813a";
+    canvas_context.font      = "13px 'Segoe UI'";
+    canvas_context.fillText("S M I E R C", cx, by + 28);
+
+    const pool = deathMessages[deathCause] || deathMessages["trap"];
+    const msg  = deathCurrentMsg || pool[0];
     canvas_context.fillStyle = "#d4c5a9";
-    canvas_context.font      = "20px Arial";
-    canvas_context.fillText("Nacisnij R aby zagrac ponownie", canvas_element.width / 2, canvas_element.height / 2 + 30);
+    canvas_context.font      = "18px 'Segoe UI'";
+    canvas_context.fillText(msg, cx, by + 72);
+
+    const causeLabel = deathCauseLabels[deathCause] || "ZGINALЕС";
+    canvas_context.fillStyle = "rgba(192,129,58,0.55)";
+    canvas_context.font      = "11px 'Segoe UI'";
+    canvas_context.fillText(causeLabel, cx, by + 100);
+
+    canvas_context.fillStyle = "rgba(192,129,58,0.45)";
+    canvas_context.font      = "12px 'Segoe UI'";
+    canvas_context.fillText("[ R ]  NOWA GRA          [ M ]  MENU", cx, by + 155);
 
     canvas_context.textAlign = "left";
 }
@@ -259,3 +326,14 @@ function render() {
 }
 let isMuted = false;
 let currentLang="PL";
+
+// przyczyna smierci — ustawiana przed gameOver = true
+let deathCause      = "trap";
+let deathCurrentMsg = "";
+
+function setDeath(cause) {
+    deathCause = cause;
+    const pool = deathMessages[cause] || deathMessages["trap"];
+    deathCurrentMsg = pool[Math.floor(Math.random() * pool.length)];
+    gameOver = true;
+}
