@@ -99,7 +99,7 @@ document.addEventListener("keydown", function (event) {
         }
     }
 
-    render();
+    
 });
 
 // ---- baza zagadek egipskich ----
@@ -289,7 +289,6 @@ function showRiddle(item) {
     overlay.classList.add("active");
 }
 
-render();
 
 // ---- przyciski menu ----
 document.getElementById("btn-new").addEventListener("click", startGame);
@@ -316,5 +315,10 @@ function startGame() {
     initEnemies();
     document.getElementById("start-screen").style.display = "none";
     document.getElementById("canvas_gry").style.display  = "block";
-    render();
+    
 }
+function gameLoop() {
+    render();
+    requestAnimationFrame(gameLoop);
+}   
+gameLoop();

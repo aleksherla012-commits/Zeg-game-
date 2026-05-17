@@ -36,7 +36,7 @@ function initEnemies() {
         // ---- logika kuli-pułapki (tylko level 2) ----
         updateFireballs();
 
-        render();
+        
     }, enemyIntervalMs);
 }
 
