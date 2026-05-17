@@ -6,6 +6,11 @@ document.addEventListener("keydown", function (event) {
 
 
     if (gameOver) {
+        if (event.key === "m" || event.key === "M") {
+            document.getElementById("canvas_gry").style.display = "none";
+            document.getElementById("start-screen").style.display = "flex";
+            return;
+        }
         if (event.key === "r" || event.key === "R") {
             currentLevel = 1;
             loadLevel(1);
@@ -68,30 +73,29 @@ document.addEventListener("keydown", function (event) {
         if (playerRow === trap.row && playerCol === trap.col) {
             hp--;
             playSound(100, 0.3);
-            if (hp <= 0) gameOver = true;
+            if (hp <= 0) setDeath("trap");
         }
     }
 
-    // kolizja gracza z kulą ognia (przy ruchu gracza)
+
+    // kolizja gracza z kula (przy ruchu gracza)
     for (const fb of fireballs) {
         if (!fb.active || fb.falling) continue;
         if (playerRow === fb.row && playerCol === fb.col) {
             hp -= 2;
             if (hp < 0) hp = 0;
             playSound(120, 0.4);
-            if (hp <= 0) gameOver = true;
+            if (hp <= 0) { setDeath("ball"); render(); return; }
             fb.falling      = true;
             fb.fallProgress = 0;
         }
-        // kolizja gracza z polem lawy (przy ruchu gracza)
         if (playerRow === fb.lavaRow && playerCol === fb.lavaCol) {
             hp -= 3;
             if (hp < 0) hp = 0;
             playSound(80, 0.5);
-            if (hp <= 0) gameOver = true;
+            if (hp <= 0) { setDeath("lava"); render(); return; }
         }
     }
-
     if (playerRow === exit.row && playerCol === exit.col) {
         if (riddleSolved) {
             playSound(800, 0.5);
@@ -279,7 +283,7 @@ function showRiddle(item) {
             } else {
                 hp--;
                 playSound(100, 0.3);
-                if (hp <= 0) { gameOver = true; render(); return; }
+                if (hp <= 0) { setDeath("riddle"); render(); return; }
 
                 const freeSpacesMap = {
                     1: [{ row:1,col:10 },{ row:7,col:4 },{ row:11,col:17 },{ row:15,col:23 }],
