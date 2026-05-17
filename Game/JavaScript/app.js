@@ -72,6 +72,26 @@ document.addEventListener("keydown", function (event) {
         }
     }
 
+    // kolizja gracza z kulą ognia (przy ruchu gracza)
+    for (const fb of fireballs) {
+        if (!fb.active || fb.falling) continue;
+        if (playerRow === fb.row && playerCol === fb.col) {
+            hp -= 2;
+            if (hp < 0) hp = 0;
+            playSound(120, 0.4);
+            if (hp <= 0) gameOver = true;
+            fb.falling      = true;
+            fb.fallProgress = 0;
+        }
+        // kolizja gracza z polem lawy (przy ruchu gracza)
+        if (playerRow === fb.lavaRow && playerCol === fb.lavaCol) {
+            hp -= 3;
+            if (hp < 0) hp = 0;
+            playSound(80, 0.5);
+            if (hp <= 0) gameOver = true;
+        }
+    }
+
     if (playerRow === exit.row && playerCol === exit.col) {
         if (riddleSolved) {
             playSound(800, 0.5);
