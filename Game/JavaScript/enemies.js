@@ -5,7 +5,7 @@ function initEnemies() {
     if (enemyTimer) clearInterval(enemyTimer);
 
     enemyTimer = setInterval(function () {
-        if (gameOver) return;
+        if (gameOver || gamePaused) return;
 
         const kierunki = [
             { dr: -1, dc: 0 },
@@ -80,6 +80,7 @@ function updateFireballs() {
 
             if (canMove(nr, nc)) {
                 fb.col = nc;
+                ballFrame = (ballFrame + 1) % 4;
             }
             fb.chaseSteps++;
 

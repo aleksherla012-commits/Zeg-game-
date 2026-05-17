@@ -112,9 +112,9 @@ const levelData = {
         enemyInterval: 360,
         items: [
             { row: 1,  col: 23, type: "heal",   collected: false },
-            { row: 3,  col: 1,  type: "key",    collected: false, keyId: 1 },
-            { row: 7,  col: 5,  type: "key",    collected: false, keyId: 2 },
-            { row: 13, col: 4,  type: "key",    collected: false, keyId: 3 },
+            { row: 11, col: 5,  type: "key",    collected: false, keyId: 1 },
+            { row: 15, col: 3,  type: "key",    collected: false, keyId: 2 },
+            { row: 17, col: 21, type: "key",    collected: false, keyId: 3 },
             { row: 1,  col: 20, type: "riddle", collected: false, riddleId: 1 },
             { row: 3,  col: 19, type: "riddle", collected: false, riddleId: 2 },
             { row: 7,  col: 18, type: "riddle", collected: false, riddleId: 3 },
@@ -224,3 +224,4 @@ let playerTargetX=1*cellSize;
 let playerTargetY=1*cellSize;
 const animSpeed = 0.3; // 0.0-1.0, im wyżej tym szybszy ruch 
 
+let riddlesSolved = 0;let gamePaused = false;
