@@ -165,7 +165,161 @@ body {
     z-index: 10;
 }
 
-/* ===== EKRAN WYBORU POZIOMU ===== */
+
+/* ===== LEVEL COMPLETE OVERLAY ===== */
+#level-complete-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.82);
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    animation: lc-fade-in 0.4s ease;
+}
+
+#level-complete-overlay.active {
+    display: flex;
+}
+
+@keyframes lc-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+#level-complete-box {
+    background: #0d0d1e;
+    border: 1px solid #c0813a;
+    padding: 44px 52px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    text-align: center;
+    position: relative;
+    animation: lc-slide-up 0.4s cubic-bezier(.22,.68,0,1.2);
+    min-width: 420px;
+}
+
+@keyframes lc-slide-up {
+    from { transform: translateY(30px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* dekoracja rogów */
+#level-complete-box::before,
+#level-complete-box::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border-color: #c0813a;
+    border-style: solid;
+}
+#level-complete-box::before {
+    top: -1px; left: -1px;
+    border-width: 2px 0 0 2px;
+}
+#level-complete-box::after {
+    bottom: -1px; right: -1px;
+    border-width: 0 2px 2px 0;
+}
+
+.lc-title-small {
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: #c0813a;
+}
+
+.lc-hieroglyph {
+    font-size: 48px;
+    line-height: 1;
+    color: #d4c5a9;
+    filter: drop-shadow(0 0 12px #c0813a88);
+}
+
+.lc-level-name {
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: #d4c5a9;
+    font-weight: 300;
+}
+
+.lc-stats {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    margin: 8px 0;
+}
+
+.lc-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 0 28px;
+}
+
+.lc-stat-divider {
+    width: 1px;
+    height: 40px;
+    background: #c0813a44;
+}
+
+.lc-stat-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #7a6a55;
+}
+
+.lc-stat-value {
+    font-size: 28px;
+    font-weight: 200;
+    color: #c0813a;
+    letter-spacing: 2px;
+}
+
+.lc-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.lc-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 22px;
+    border: 1px solid #2a2a3a;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    min-width: 100px;
+}
+
+.lc-btn:hover {
+    border-color: #c0813a;
+    background: #c0813a0f;
+    transform: translateY(-2px);
+}
+
+.lc-btn.disabled {
+    opacity: 0.3;
+    cursor: default;
+    pointer-events: none;
+}
+
+.lc-btn-icon {
+    font-size: 22px;
+    color: #c0813a;
+}
+
+.lc-btn-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #7a6a55;
+    line-height: 1.5;
+}
 #level-select-screen {
     position: fixed;
     top: 0; left: 0;
