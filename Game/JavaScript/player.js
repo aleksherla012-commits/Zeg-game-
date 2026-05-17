@@ -222,5 +222,5 @@ let playerPixelX=1*cellSize;
 let playerPixelY=1*cellSize;
 let playerTargetX=1*cellSize;
 let playerTargetY=1*cellSize;
-const animSpeed = 0.2; // 0.0-1.0, im wyżej tym szybszy ruch 
+const animSpeed = 0.3; // 0.0-1.0, im wyżej tym szybszy ruch 
 

@@ -1,6 +1,7 @@
 // tworzy dźwięk(C)
 const audioCtx = new AudioContext();
 function playSound(frequency, duration) {
+    if (isMuted) return;
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
     oscillator.connect(gainNode);

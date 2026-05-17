@@ -116,12 +116,13 @@ function drawPlayer() {
     const margin = 5;
     canvas_context.fillStyle = "blue";
     canvas_context.fillRect(
-        playerCol * cellSize + margin,
-        playerRow * cellSize + margin,
+        playerPixelX + margin,
+        playerPixelY + margin,
         cellSize - margin * 2,
         cellSize - margin * 2
     );
 }
+
 
 // ---- rysuje HP i statystyki ----
 function drawHP() {
@@ -215,3 +216,5 @@ function render() {
     drawHP();
     if (gameOver) drawGameOver();
 }
+let isMuted = false;
+let currentLang="PL";

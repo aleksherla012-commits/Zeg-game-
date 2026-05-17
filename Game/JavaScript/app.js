@@ -30,8 +30,8 @@ document.addEventListener("keydown", function (event) {
             blockedDoor.open = true;
             playerRow = newRow;
             playerCol = newCol;
-            playerTargetPixelX = newCol * cellSize;
-            playerTargetPixelY = newRow * cellSize;
+            playerTargetX = newCol * cellSize;
+            playerTargetY = newRow * cellSize;
             playSound(500, 0.3);
             score++;
         } else {
@@ -40,6 +40,8 @@ document.addEventListener("keydown", function (event) {
     } else if (canMove(newRow, newCol)) {
         playerRow = newRow;
         playerCol = newCol;
+        playerTargetX = newCol * cellSize;
+        playerTargetY = newRow * cellSize;
         playSound(200, 0.05);
         score++;
     }
@@ -301,6 +303,30 @@ document.getElementById("btn-continue").addEventListener("click", function () {
     } else {
         alert("nie zapisałeś żadnej gry");
     }
+});
+
+
+//otwiera settings
+document.getElementById("btn-settings").addEventListener("click", function () {
+    document.getElementById("start-screen").style.display = "none";
+    document.getElementById("settings-screen").style.display = "flex";
+});
+//przycisk mute
+document.getElementById("btn-mute").addEventListener("click", function () {
+    isMuted = !isMuted;
+    his.innerHTML = isMuted
+        ? "Dźwięk: WYŁ <span>🔇</span>"
+        : "Dźwięk: WŁ <span>🔊</span>";
+});
+//przycisk jezyk
+document.getElementById("btn-lang").addEventListener("click", function () {
+    currentLang = currentLang === "PL" ? "EN" : "PL";
+    this.innerHTML ='Język: ${currentLang} <span>🌐</span>';
+});
+//powrót do menu
+document.getElementById("btn-back").addEventListener("click", function () {
+    document.getElementById("settings-screen").style.display = "none";
+    document.getElementById("start-screen").style.display = "flex";
 });
 
 document.getElementById("btn-quit").addEventListener("click", function () {
