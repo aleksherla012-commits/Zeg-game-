@@ -18,9 +18,12 @@ keyImgs[3].src = "Assets/green_key.png";
 const floorImg      = new Image(); floorImg.src      = "Assets/podloga_piaskowiec.png";
 const floorCrackImg = new Image(); floorCrackImg.src = "Assets/zlamana_podloga.png";
 const ballImg       = new Image(); ballImg.src       = "Assets/kula.png";
+const lavaImg = new Image(); lavaImg.src = "Assets/lawa.png";
 
 // klatka animacji kuli (0-3) — aktualizowana w enemies.js
 let ballFrame = 0;
+// klatka animacji lawy (0-3)
+let lavaFrame = 0;
 const BALL_FRAMES = 4;
 const BALL_COLS = 2; // sprite sheet 2x2
 
@@ -92,8 +95,14 @@ function drawPixelDoor(x, y, s) {
 
 // lawa
 function drawLavaPool(x, y, s) {
-    canvas_context.fillStyle = "#8b0000";
-    canvas_context.fillRect(x, y, s, s);
+    if (lavaImg.complete && lavaImg.naturalWidth > 0) {
+        canvas_context.drawImage(lavaImg,
+            lavaFrame * 64, 0, 64, 64,
+            x, y, s, s);
+    } else {
+        canvas_context.fillStyle = "#8b0000";
+        canvas_context.fillRect(x, y, s, s);
+    }
 }
 
 // ---- rysuje kule ognia z animacja obrotu ----
