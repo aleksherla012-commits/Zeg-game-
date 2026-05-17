@@ -377,7 +377,10 @@ document.getElementById("btn-back").addEventListener("click", function () {
 });
 
 document.getElementById("btn-quit").addEventListener("click", function () {
-    if (confirm("Czy na pewno chcesz wyjsc?")) window.close();
+    if (confirm("Czy na pewno chcesz wyjsc?")) {
+        localStorage.removeItem("veilUnlocked");
+        window.close();
+    }
 });
 
 function startGame(lvl) {
