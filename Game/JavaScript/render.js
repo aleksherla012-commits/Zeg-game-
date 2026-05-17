@@ -1,7 +1,7 @@
 // canvas
 const canvas_element = document.getElementById("canvas_gry");
 const canvas_context  = canvas_element.getContext("2d");
-canvas_context.imageSmoothingEnabled = false;
+canvas_context.imageSmoothingEnabled = true;
 
 const heartImg = new Image();
 heartImg.src = "Assets/heart.png";
@@ -14,20 +14,43 @@ keyImgs[1].src = "Assets/blue_key.png";
 keyImgs[2].src = "Assets/red_key.png";
 keyImgs[3].src = "Assets/green_key.png";
 
+// sprite'y środowiska
+const floorImg      = new Image(); floorImg.src      = "Assets/podloga_piaskowiec.png";
+const floorCrackImg = new Image(); floorCrackImg.src = "Assets/zlamana_podloga.png";
+const ballImg       = new Image(); ballImg.src       = "Assets/kula.png";
+
+// klatka animacji kuli (0-3) — aktualizowana w enemies.js
+let ballFrame = 0;
+const BALL_FRAMES = 4;
+const BALL_COLS = 2; // sprite sheet 2x2
+
 // ---- rysuje labirynt ----
 function drawMaze() {
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
-            canvas_context.fillStyle = maze[i][j] === 1 ? "black" : "white";
-            canvas_context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            if (maze[i][j] === 1) {
+                canvas_context.fillStyle = "black";
+                // +1px zeby nie bylo szczelin miedzy kafle
+                canvas_context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            } else {
+                // losowo mieszaj tekstury podlogi dla urozmaicenia (deterministycznie per komorka)
+                const useCrack = ((i * 7 + j * 13) % 5 === 0) && floorCrackImg.complete && floorCrackImg.naturalWidth > 0;
+                const img = useCrack ? floorCrackImg : floorImg;
+                if (img.complete && img.naturalWidth > 0) {
+                    canvas_context.drawImage(img, j * cellSize, i * cellSize, cellSize, cellSize);
+                } else {
+                    canvas_context.fillStyle = "#e8d090";
+                    canvas_context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                }
+            }
         }
     }
 
-    // blok przed metą gdy zagadki nierozwiązane
+    // blok przed meta gdy zagadki nierozwiazane
     if (!riddleSolved) {
         canvas_context.fillStyle = "black";
         canvas_context.fillRect(
-            (exit.col - 1) * cellSize, exit.row * cellSize, cellSize, cellSize
+            (exit.col - 1) * cellSize, exit.row * cellSize, cellSize + 1, cellSize + 1
         );
     }
 
@@ -35,15 +58,15 @@ function drawMaze() {
     canvas_context.fillStyle = "gold";
     canvas_context.fillRect(exit.col * cellSize, exit.row * cellSize, cellSize, cellSize);
 
-    // pułapki — ukryte (kolor podłogi) na lvl 3, widoczne (czerwone) na pozostałych
+    // pulapki — czerwone (widoczne) lub ciemny odcien (ukryte na lvl 3)
     for (const trap of traps) {
         if (trap.hidden) {
-            // kolor niemal identyczny z podłogą — ledwo widoczny odcień
-            canvas_context.fillStyle = "#f0f0f0";
+            canvas_context.fillStyle = "rgba(0,0,0,0.22)";
+            canvas_context.fillRect(trap.col * cellSize, trap.row * cellSize, cellSize, cellSize);
         } else {
             canvas_context.fillStyle = "red";
+            canvas_context.fillRect(trap.col * cellSize, trap.row * cellSize, cellSize, cellSize);
         }
-        canvas_context.fillRect(trap.col * cellSize, trap.row * cellSize, cellSize, cellSize);
     }
 
     // drzwi
@@ -51,13 +74,13 @@ function drawMaze() {
         if (!door.open) drawPixelDoor(door.col * cellSize, door.row * cellSize, cellSize);
     }
 
-    // źródło lavy (rysowane raz, stale widoczne na lvl 2)
+    // zrodlo lavy
     for (const fb of fireballs) {
         drawLavaPool(fb.lavaCol * cellSize, fb.lavaRow * cellSize, cellSize);
     }
 }
 
-// drzwi — brąz + złota klamka
+// drzwi — braz + zlota klamka
 function drawPixelDoor(x, y, s) {
     canvas_context.fillStyle = "#8B4513";
     canvas_context.fillRect(x, y, s, s);
@@ -67,13 +90,13 @@ function drawPixelDoor(x, y, s) {
     canvas_context.fill();
 }
 
-// ---- lawa: zwykly ciemnoczerwony kwadrat (grafike dorobi uzytkownik) ----
+// lawa
 function drawLavaPool(x, y, s) {
     canvas_context.fillStyle = "#8b0000";
     canvas_context.fillRect(x, y, s, s);
 }
 
-// ---- rysuje kule ognia: pomaranczowy kwadrat (grafike dorobi uzytkownik) ----
+// ---- rysuje kule ognia z animacja obrotu ----
 function drawFireballs() {
     for (const fb of fireballs) {
         if (!fb.active) continue;
@@ -88,13 +111,23 @@ function drawFireballs() {
             drawY = drawY + (targetY - drawY) * fb.fallProgress;
         }
 
-        // pomaranczowy kwadrat — zajmuje cala komorke
-        canvas_context.fillStyle = "#ff6600";
-        canvas_context.fillRect(drawX, drawY, cellSize, cellSize);
+        if (ballImg.complete && ballImg.naturalWidth > 0) {
+            // sprite sheet 2x2 — wybierz klatke
+            const frameW = ballImg.naturalWidth / 2;
+            const frameH = ballImg.naturalHeight / 2;
+            const srcX = (ballFrame % 2) * frameW;
+            const srcY = Math.floor(ballFrame / 2) * frameH;
+            canvas_context.drawImage(ballImg,
+                srcX, srcY, frameW, frameH,
+                drawX, drawY, cellSize, cellSize);
+        } else {
+            canvas_context.fillStyle = "#ff6600";
+            canvas_context.fillRect(drawX, drawY, cellSize, cellSize);
+        }
     }
 }
 
-// ---- rysuje przeciwników ----
+// ---- rysuje przeciwnikow ----
 function drawEnemies() {
     const kolory = ["orange", "purple", "#00e5ff"];
     const margin = 5;
@@ -157,13 +190,13 @@ function drawItems() {
     const solved   = riddlesSolved;
     const required = riddlesRequired;
     const done     = solved >= required;
-    const status   = done ? "🔓 Wyjście otwarte" : `🔒 Zagadki: ${solved}/${required}`;
+    const status   = done ? "Wyjscie otwarte" : "Zagadki: " + solved + "/" + required;
     canvas_context.fillStyle = done ? "lime" : "red";
     canvas_context.font      = "bold 20px Arial";
     canvas_context.fillText(status, 490, canvas_element.height - 10);
 }
 
-// ---- ekran końcowy ----
+// ---- ekran koncowy ----
 function drawGameOver() {
     canvas_context.fillStyle = "rgba(0,0,0,0.7)";
     canvas_context.fillRect(0, 0, canvas_element.width, canvas_element.height);
@@ -171,28 +204,25 @@ function drawGameOver() {
     canvas_context.fillStyle   = "#c0813a";
     canvas_context.font        = "bold 60px Arial";
     canvas_context.textAlign   = "center";
-    canvas_context.fillText("Koniec gry💀💀💀💀", canvas_element.width / 2, canvas_element.height / 2 - 20);
+    canvas_context.fillText("Koniec gry", canvas_element.width / 2, canvas_element.height / 2 - 20);
 
     canvas_context.fillStyle = "#d4c5a9";
     canvas_context.font      = "20px Arial";
-    canvas_context.fillText("Naciśnij R aby zagrać ponownie", canvas_element.width / 2, canvas_element.height / 2 + 30);
+    canvas_context.fillText("Nacisnij R aby zagrac ponownie", canvas_element.width / 2, canvas_element.height / 2 + 30);
 
     canvas_context.textAlign = "left";
 }
 
-
-// ---- mgła wojny (level 3+): zakrywa komórki dalej niż fogRadius od gracza ----
+// ---- mgla wojny (level 3+) ----
 function drawFog() {
-    const fogRadius = 4; // widoczność 4 komórek
+    const fogRadius = 4;
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             const dist = Math.abs(i - playerRow) + Math.abs(j - playerCol);
             if (dist > fogRadius) {
-                // całkowita ciemność — nic nie widać
                 canvas_context.fillStyle = "rgba(0,0,0,1)";
                 canvas_context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
             } else if (dist === fogRadius) {
-                // miękka krawędź tylko na granicy zasięgu
                 canvas_context.fillStyle = "rgba(0,0,0,0.6)";
                 canvas_context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
             }
@@ -200,7 +230,7 @@ function drawFog() {
     }
 }
 
-// ---- główna funkcja render ----
+// ---- glowna funkcja render ----
 function render() {
     canvas_context.clearRect(0, 0, canvas_element.width, canvas_element.height);
     drawMaze();
