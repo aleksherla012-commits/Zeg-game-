@@ -164,6 +164,125 @@ body {
     justify-content: center;
     z-index: 10;
 }
+
+/* ===== EKRAN WYBORU POZIOMU ===== */
+#level-select-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 70%);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    gap: 40px;
+}
+
+.level-select-header {
+    text-align: center;
+}
+
+.level-select-header h1 {
+    font-size: 36px;
+    font-weight: 200;
+    letter-spacing: 16px;
+    color: #d4c5a9;
+    margin-bottom: 4px;
+}
+
+.level-select-header h2 {
+    font-size: 12px;
+    letter-spacing: 8px;
+    color: #c0813a;
+}
+
+.level-cards {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+}
+
+.level-card {
+    width: 160px;
+    min-height: 220px;
+    border: 1px solid #2a2a3a;
+    background: #0d0d1e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px 16px;
+    position: relative;
+    transition: border-color 0.25s, background 0.25s, transform 0.2s;
+    text-align: center;
+}
+
+.level-card.unlocked {
+    cursor: pointer;
+    border-color: #c0813a55;
+}
+
+.level-card.unlocked:hover {
+    border-color: #c0813a;
+    background: #c0813a0d;
+    transform: translateY(-4px);
+}
+
+.level-card.locked {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.level-lock {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 13px;
+    opacity: 0.7;
+}
+
+.level-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #c0813a;
+    margin-bottom: 4px;
+}
+
+.level-icon {
+    font-size: 38px;
+    color: #d4c5a9;
+    line-height: 1;
+    margin: 6px 0;
+}
+
+.level-name {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #d4c5a9;
+    line-height: 1.4;
+}
+
+.level-desc {
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: #7a6a55;
+    margin-top: 4px;
+}
+
+.level-req {
+    font-size: 10px;
+    color: #c0813a88;
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+}
+
+.level-select-footer {
+    display: flex;
+    justify-content: center;
+}
+
 #settings-screen h1 {
     font-size: 80px;
     font-weight: 200;
