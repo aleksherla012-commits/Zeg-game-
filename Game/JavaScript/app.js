@@ -359,7 +359,7 @@ document.getElementById("btn-continue").addEventListener("click", function () {
         alert("nie zapisales zadnej gry");
     }
 });
-
+//słownik tłumaczeń (na potrzeby przycisków i komunikatów)
 const translations = {
     PL:{
         newGame: "Nowa Gra",
@@ -386,6 +386,21 @@ const translations = {
         quitMSG: "Are you sure you want to quit?",
     },
 };
+
+
+//funkcja do zmiany jezyka
+function applyLanguage(lang) {
+    const t = translations[lang];
+    document.getElementById("btn-new").childNodes[0].textContent = t.newGame +"";
+    document.getElementById("btn-continue").childNodes[0].textContent = t.continue +"";
+    document.getElementById("btn-settings").childNodes[0].textContent = t.settings +"";
+    document.getElementById("btn-quit").childNodes[0].textContent = t.quit +"";
+    document.getElementById("btn-mute").childNodes[0].textContent = t.sound_off +"";
+    document.getElementById("btn-lang").childNodes[0].textContent = t.lang +"";
+    document.getElementById("btn-back").childNodes[0].textContent = t.back +"";
+    const muteBtn = document.getElementById("btn-mute");
+    muteBtn.childNodes[0].textContent = (isMuted ? t.sound_off + " " : t.sound_on) + " ";
+}
 
 
 //otwiera settings
