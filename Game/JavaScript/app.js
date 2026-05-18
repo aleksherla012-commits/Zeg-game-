@@ -356,7 +356,7 @@ document.getElementById("btn-continue").addEventListener("click", function () {
         showCanvas();
         render();
     } else {
-        alert("nie zapisales zadnej gry");
+        alert(translations[currentLang].noSave);
     }
 });
 //słownik tłumaczeń (na potrzeby przycisków i komunikatów)
@@ -418,7 +418,7 @@ document.getElementById("btn-mute").addEventListener("click", function () {
 //przycisk jezyk
 document.getElementById("btn-lang").addEventListener("click", function () {
     currentLang = currentLang === "PL" ? "EN" : "PL";
-    this.innerHTML = `Język: ${currentLang} <span>🌐</span>`;
+    applyLanguage(currentLang);
 });
 //powrót do menu
 document.getElementById("btn-back").addEventListener("click", function () {
@@ -427,7 +427,7 @@ document.getElementById("btn-back").addEventListener("click", function () {
 });
 
 document.getElementById("btn-quit").addEventListener("click", function () {
-    if (confirm("Czy na pewno chcesz wyjsc?")) {
+    if (confirm(translations[currentLang].quitMSG)) {
         localStorage.removeItem("veilUnlocked");
         window.close();
     }
