@@ -360,6 +360,33 @@ document.getElementById("btn-continue").addEventListener("click", function () {
     }
 });
 
+const translations = {
+    PL:{
+        newGame: "Nowa Gra",
+        continue: "Kontynuuj",
+        settings: "Ustawienia",
+        quit: "Wyjście",
+        sound_on: "Dźwięk: WŁ",
+        sound_off: "Dźwięk: WYŁ",
+        lamg: "Język: PL",
+        back: "Powrót",
+        noSave: "nie zapisałes zadnej gry",
+        quitMSG: "Czy na pewno chcesz wyjsc?",
+    },
+    EN:{
+        newGame: "New Game",
+        continue: "Continue",
+        settings: "Settings",
+        quit: "Quit",
+        sound_on: "Sound: ON",
+        sound_off: "Sound: OFF",
+        lang: "Language: EN",
+        back: "Back",
+        noSave: "You haven't saved any game",
+        quitMSG: "Are you sure you want to quit?",
+    },
+};
+
 
 //otwiera settings
 document.getElementById("btn-settings").addEventListener("click", function () {
