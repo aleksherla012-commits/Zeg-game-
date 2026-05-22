@@ -397,6 +397,7 @@ function applyLanguage(lang) {
     document.getElementById("btn-mute").childNodes[0].textContent = t.sound_off +"";
     document.getElementById("btn-lang").childNodes[0].textContent = t.lang +"";
     document.getElementById("btn-back").childNodes[0].textContent = t.back +"";
+    document.getElementById("settings-title").textContent = t.settings; 
     const muteBtn = document.getElementById("btn-mute");
     muteBtn.childNodes[0].textContent = (isMuted ? t.sound_off + " " : t.sound_on) + " ";
 }
@@ -410,9 +411,10 @@ document.getElementById("btn-settings").addEventListener("click", function () {
 //przycisk mute
 document.getElementById("btn-mute").addEventListener("click", function () {
     isMuted = !isMuted;
+    const t = translations[currentLang];
     this.innerHTML = isMuted
-        ? "Dźwięk: WYŁ <span>🔇</span>"
-        : "Dźwięk: WŁ <span>🔊</span>";
+        ? `${t.sound_off} <span>🔇</span>`
+        : `${t.sound_on} <span>🔊</span>`;
 });
 //przycisk jezyk
 document.getElementById("btn-lang").addEventListener("click", function () {
