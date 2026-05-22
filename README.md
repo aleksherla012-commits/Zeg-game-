@@ -136,5 +136,3 @@ Za każde ukończone zagadki i zebrany klucz zdobywasz punkty. Twój najlepszy w
 
 *Projekt stworzony z miłości do retro-gier labiryntowych i egipskiej mitologii.*  
 *Śmierć jest tu nauczycielem. Cierpliwość — kluczem.*
-
-𓏧𓏧𓏧
