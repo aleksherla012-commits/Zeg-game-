@@ -12,8 +12,7 @@ document.addEventListener("keydown", function (event) {
             return;
         }
         if (event.key === "r" || event.key === "R") {
-            currentLevel = 1;
-            loadLevel(1);
+            loadLevel(currentLevel);
             riddlesSolved = 0;
             score = 0;
             initEnemies();
