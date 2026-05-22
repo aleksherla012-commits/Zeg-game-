@@ -368,7 +368,7 @@ const translations = {
         quit: "Wyjście",
         sound_on: "Dźwięk: WŁ",
         sound_off: "Dźwięk: WYŁ",
-        lamg: "Język: PL",
+        lang: "Język: PL",
         back: "Powrót",
         noSave: "nie zapisałes zadnej gry",
         quitMSG: "Czy na pewno chcesz wyjsc?",
