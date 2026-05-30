@@ -421,6 +421,21 @@ const hudLabelEls = document.querySelectorAll(".hud-label");
 hudLabelEls.forEach(function(el, i) {
     if (labels[i]) el.textContent = labels[i];
 });
+
+const levelCards = document.querySelectorAll(".level-card");
+levelCards.forEach(function(card, i) {
+const lvl=t.levels[i];
+if (lvl) {
+    const labelEl = card.querySelector(".level-label");
+    const nameEl  = card.querySelector(".level-name");
+    const descEl  = card.querySelector(".level-desc");
+    const reqEl   = card.querySelector(".level-req");
+    if (labelEl) labelEl.textContent = lvl.label;
+    if (nameEl) nameEl.innerHTML = lvl.name.replace("\n", "<br>");
+    if (descEl) descEl.textContent = lvl.desc;
+    if (reqEl) reqEl.textContent = lvl.req;
+}
+});
 }
 
 
