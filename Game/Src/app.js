@@ -371,6 +371,12 @@ const translations = {
         back: "Powrót",
         noSave: "nie zapisałes zadnej gry",
         quitMSG: "Czy na pewno chcesz wyjsc?",
+        levels: [
+    { label: "POZIOM 1", name: "Podziemia\nFaraona", desc: "Strach zaczyna się tutaj", req: "Ukończ poziom 1" },
+    { label: "POZIOM 2", name: "Komory\nZapomnianych", desc: "Lawa nie będzie czekać", req: "Ukończ poziom 2" },
+    { label: "POZIOM 3", name: "Krypta\nWiecznego Snu", desc: "Mgła pochłania wszystko", req: "Ukończ poziom 3" },
+    { label: "POZIOM 4", name: "Sanktuarium\nRa",        desc: "Ostateczny test",          req: "Ukończ poziom 4" },
+],
     },
     EN:{
         newGame: "New Game",
@@ -383,6 +389,13 @@ const translations = {
         back: "Back",
         noSave: "You haven't saved any game",
         quitMSG: "Are you sure you want to quit?",
+        levels: [
+    { label: "LEVEL 1", name: "Pharaoh's\nUndergound",  desc: "Fear starts here",          req: "Complete level 1" },
+    { label: "LEVEL 2", name: "Chambers of\nForgotten", desc: "Lava won't wait",           req: "Complete level 2" },
+    { label: "LEVEL 3", name: "Crypt of\nEternal Sleep", desc: "Fog consumes all",         req: "Complete level 3" },
+    { label: "LEVEL 4", name: "Sanctuary\nof Ra",        desc: "The final trial",          req: "Complete level 4" },
+],
+               
     },
 };
 
@@ -391,7 +404,7 @@ const translations = {
 function applyLanguage(lang) {
     const t = translations[lang];
     document.getElementById("btn-new").childNodes[0].textContent = t.newGame +"";
-    document.getElementById("btn-continue").childNodes[0].textContent = t.continueG +"";
+    document.getElementById("btn-continue").childNodes[0].textContent = t.continue +"";
     document.getElementById("btn-settings").childNodes[0].textContent = t.settings +"";
     document.getElementById("btn-quit").childNodes[0].textContent = t.quit +"";
     document.getElementById("btn-lang").childNodes[0].textContent = t.lang +"";
