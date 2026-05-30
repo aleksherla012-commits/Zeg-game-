@@ -391,15 +391,23 @@ const translations = {
 function applyLanguage(lang) {
     const t = translations[lang];
     document.getElementById("btn-new").childNodes[0].textContent = t.newGame +"";
-    document.getElementById("btn-continue").childNodes[0].textContent = t.continue +"";
+    document.getElementById("btn-continue").childNodes[0].textContent = t.continueG +"";
     document.getElementById("btn-settings").childNodes[0].textContent = t.settings +"";
     document.getElementById("btn-quit").childNodes[0].textContent = t.quit +"";
-    document.getElementById("btn-mute").childNodes[0].textContent = t.sound_off +"";
     document.getElementById("btn-lang").childNodes[0].textContent = t.lang +"";
     document.getElementById("btn-back").childNodes[0].textContent = t.back +"";
     document.getElementById("settings-title").textContent = t.settings; 
     const muteBtn = document.getElementById("btn-mute");
     muteBtn.childNodes[0].textContent = (isMuted ? t.sound_off + " " : t.sound_on) + " ";
+const hudLabels = {
+    PL: ["ŻYCIA", "KLUCZE", "ZAGADKI", "WYNIK", "REKORD", "POZIOM"],
+    EN: ["LIVES",  "KEYS",   "RIDDLES", "SCORE", "RECORD", "LEVEL" ],
+};
+const labels = hudLabels[lang];
+const hudLabelEls = document.querySelectorAll(".hud-label");
+hudLabelEls.forEach(function(el, i) {
+    if (labels[i]) el.textContent = labels[i];
+});
 }
 
 
