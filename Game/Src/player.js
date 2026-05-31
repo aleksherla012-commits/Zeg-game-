@@ -116,11 +116,11 @@ const levelData = {
             { row: 15, col: 3,  type: "key",    collected: false, keyId: 2 },
             { row: 17, col: 21, type: "key",    collected: false, keyId: 3 },
             { row: 1,  col: 20, type: "riddle", collected: false, riddleId: 1 },
-            { row: 3,  col: 19, type: "riddle", collected: false, riddleId: 2 },
+            { row: 3,  col: 17, type: "riddle", collected: false, riddleId: 2 },
             { row: 7,  col: 16, type: "riddle", collected: false, riddleId: 3 },
         ],
         doors: [
-            { row: 4,  col: 3,  keyId: 1, open: false },
+            
             { row: 10, col: 3,  keyId: 2, open: false },
             { row: 16, col: 2,  keyId: 3, open: false },
         ],

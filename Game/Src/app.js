@@ -163,7 +163,7 @@ document.addEventListener("keydown", function (event) {
         }
 
 
-        if(curremtLevel===4){
+        if(currentLevel===4){
             showVictory();
         }else{
         //poazuje overlay
