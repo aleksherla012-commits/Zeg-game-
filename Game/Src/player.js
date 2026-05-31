@@ -113,11 +113,11 @@ const levelData = {
         items: [
             { row: 1,  col: 23, type: "heal",   collected: false },
             { row: 11, col: 5,  type: "key",    collected: false, keyId: 1 },
-            { row: 15, col: 3,  type: "key",    collected: false, keyId: 2 },
+            { row: 2, col: 3,  type: "key",    collected: false, keyId: 2 },
             { row: 17, col: 21, type: "key",    collected: false, keyId: 3 },
             { row: 1,  col: 20, type: "riddle", collected: false, riddleId: 1 },
-            { row: 3,  col: 17, type: "riddle", collected: false, riddleId: 2 },
-            { row: 7,  col: 16, type: "riddle", collected: false, riddleId: 3 },
+            { row: 1,  col: 14, type: "riddle", collected: false, riddleId: 2 },
+            { row: 9,  col: 16, type: "riddle", collected: false, riddleId: 3 },
         ],
         doors: [
             
@@ -157,7 +157,7 @@ const levelData = {
             {row:3, col:3, type:"key", collected:false, keyId:1},
             {row:7, col:11, type:"key", collected:false, keyId:2},
             {row:13, col:17, type:"key", collected:false, keyId:3},
-            {row:1, col:18, type:"riddle", collected:false, riddleId:1},
+            {row:1, col:17, type:"riddle", collected:false, riddleId:1},
             {row:5, col:7, type:"riddle", collected:false, riddleId:2},
             {row:11, col:3, type:"riddle", collected:false, riddleId:3},
             {row:17, col:5, type:"riddle", collected:false, riddleId:4},
