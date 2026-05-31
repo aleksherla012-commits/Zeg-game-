@@ -118,10 +118,58 @@ document.addEventListener("keydown", function (event) {
             btnNext.classList.remove("disabled");
         }
 
+
+
+        //funkcja ekranu końcowego gry 
+        function showVictory(){
+            const overlay=document.getElementById("level-complete-overlay");
+            const box=document.getElementById("level-complete-box");
+              box.innerHTML = `
+        <div class="lc-title-small">${currentLang === "PL" ? "GRATULACJE" : "CONGRATULATIONS"}</div>
+        <div class="lc-hieroglyph">𓁹</div>
+        <div class="lc-level-name">${currentLang === "PL" ? "UKOŃCZYŁEŚ VEIL OF RIDDLES" : "YOU COMPLETED VEIL OF RIDDLES"}</div>
+        <div class="lc-stats">
+            <div class="lc-stat">
+                <span class="lc-stat-label">${currentLang === "PL" ? "WYNIK" : "SCORE"}</span>
+                <span class="lc-stat-value">${score}</span>
+            </div>
+            <div class="lc-stat-divider"></div>
+            <div class="lc-stat">
+                <span class="lc-stat-label">${currentLang === "PL" ? "REKORD" : "RECORD"}</span>
+                <span class="lc-stat-value">${highScore}</span>
+            </div>
+        </div>
+        <div class="lc-buttons">
+            <div class="lc-btn" id="vic-btn-menu">
+                <span class="lc-btn-icon">↩</span>
+                <span class="lc-btn-label">${currentLang === "PL" ? "MENU\nGŁÓWNE" : "MAIN\nMENU"}</span>
+            </div>
+        </div>
+    `;
+            gamePaused=true;
+            overlay.classList.add("active");
+            document.getElementById("vic-btn-menu").addEventListener("click",function(){
+                overlay.classList.remove("active");
+                document.getElementById("game-wrapper").style.display="none";
+                document.getElementById("start-screen").style.display="flex";
+                gamePaused=false;
+                score=0;
+                riddlesSolved=0;
+                unlockedLevels=1;
+                loadLevels(1);
+                initEnemies();
+            });
+
+        }
+
+
+        if(curremtLevel===4){
+            showVictory();
+        }else{
         //poazuje overlay
         gamePaused = true;
         document.getElementById("level-complete-overlay").classList.add("active");
-        updateLevelCards();
+        updateLevelCards();}
     }
 
 
