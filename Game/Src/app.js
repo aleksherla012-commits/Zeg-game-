@@ -97,7 +97,7 @@ document.addEventListener("keydown", function (event) {
     }
 
     //funkcja definiuje showlevelcomplete
-    function showLevelComplete() {
+    function showlevelComplete() {
         const levelNames = {
             PL:["PODZIEMIA FARAONA", "KOMORY ZAPOMNIANYCH", "KRYPTA WIECZNEGO SNU", "SANKTUARIUM BOGA RA"],
             EN:["PHARAOH'S UNDERGROUND", "CHAMBERS OF FORGOTTEN", "CRYPT OF ETERNAL SLEEP", "SANCTUARY OF RA"],
@@ -406,11 +406,12 @@ function showRiddle(item) {
 
 // ---- poziomy odblokowane (zapisane w localStorage) ----
 function getUnlockedLevels() {
-    try { return JSON.parse(localStorage.getItem("veilUnlocked") || "[1]"); } catch(e) { return [1]; }
+    return parseInt(localStorage.getItem("veilUnlocked") || "1");
 }
-function unlockLevel(n) {
-    const ul = getUnlockedLevels();
-    if (!ul.includes(n)) { ul.push(n); localStorage.setItem("veilUnlocked", JSON.stringify(ul)); }
+function unlockLevel(n){
+    const current = getUnlockedLevels();
+    if(n>current) localStorage.setItem("veilUnlocked", n);
+    if (n>unlockedLevels) unlockedLevels=n;
 }
 function updateLevelCards() {
     const ul = getUnlockedLevels();
@@ -483,13 +484,21 @@ document.getElementById("btn-level-back").addEventListener("click", function() {
 });
 
 document.getElementById("btn-continue").addEventListener("click", function () {
-    if (score > 0 || currentLevel > 1) {
+const saved = localStorage.getItem("veilCurrentLevel");
+    if (saved) {
+        currentLevel = parseInt(saved);
+  riddlesSolved = 0;
+        score = 0;
+        const savedHS = localStorage.getItem("veilHighScore");
+        if (savedHS) highScore = parseInt(savedHS);
+        loadLevel(currentLevel);
+        initEnemies();
         document.getElementById("start-screen").style.display = "none";
         showCanvas();
-        render();
-    } else {
-        alert(translations[currentLang].noSave);
+    }else{
+            alert(translations[currentLang].noSave);
     }
+    
 });
 //słownik tłumaczeń (na potrzeby przycisków i komunikatów)
 const translations = {
@@ -641,7 +650,15 @@ function showLevelComplete() {
         btnNext.classList.remove("disabled");
     }
 
+    //zapis postepu w localStorage
+    localStorage.setItem("veilUnlocked",unlockedLevels);
+    localStorage.setItem("veilHighScore",highScore);
+    localStorage.setItem("veilCurrentLevel",currentLevel<4? currentLevel+1:1);
+    if(currentLevel>=4){
+        showVictory();
+    }else{
     overlay.classList.add("active");
+    }
 }
 
 document.getElementById("lc-btn-next").addEventListener("click", function() {
