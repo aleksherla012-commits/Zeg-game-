@@ -121,6 +121,7 @@ document.addEventListener("keydown", function (event) {
         //poazuje overlay
         gamePaused = true;
         document.getElementById("level-complete-overlay").classList.add("active");
+        updateLevelCards();
     }
 
 
@@ -129,7 +130,7 @@ document.addEventListener("keydown", function (event) {
             document.getElementById("level-complete-overlay").classList.remove("active");
             gamePaused = false;
             if (currentLevel < 4) {
-                currentLevel++;
+         
                 score = 0;
                 riddlesSolved = 0;
                 loadLevel(currentLevel);
@@ -141,8 +142,9 @@ document.addEventListener("keydown", function (event) {
         document.getElementById("lc-btn-levels").addEventListener("click", function() {
         document.getElementById("level-complete-overlay").classList.remove("active");
         document.getElementById("game-wrapper").style.display = "none";
-        document.getElementById("level-select-screen").style.display = "flex";
+        document.getElementById("n").style.display = "flex";
         gamePaused = false;
+        updateLevelCards();
         
         });
         //menu główne
@@ -404,6 +406,28 @@ document.querySelectorAll(".level-card").forEach(function(card) {
         showCanvas();
     });
 });
+
+
+
+//ile poziomów ukończono 
+let unlockedLevels=1;
+//funkcja odblokowująca poziomy i aktualizująca karty poziomów
+function updateLevelCards() {
+    document.querySelectorAll(".level-card").forEach(function(card) {
+        const lvl = parseInt(card.dataset.level);
+        if (lvl <= unlockedLevels) {
+            card.classList.remove("locked");
+            card.classList.add("unlocked");
+            const lockEl= card.querySelector(".level-lock");
+            if (lockEl) lockEl.style.display = "none";
+        }else {
+            card.classList.remove("unlocked");
+            card.classList.add("locked");
+        }
+    });
+}
+
+
 
 document.getElementById("btn-level-back").addEventListener("click", function() {
     document.getElementById("level-select-screen").style.display = "none";
