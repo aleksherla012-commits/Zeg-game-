@@ -95,6 +95,67 @@ document.addEventListener("keydown", function (event) {
             if (hp <= 0) { setDeath("lava"); render(); return; }
         }
     }
+
+    //funkcja definiuje showlevelcomplete
+    function showLevelComplete() {
+        const levelNames = {
+            PL:["PODZIEMIA FARAONA", "KOMORY ZAPOMNIANYCH", "KRYPTA WIECZNEGO SNU", "SANKTUARIUM BOGA RA"],
+            EN:["PHARAOH'S UNDERGROUND", "CHAMBERS OF FORGOTTEN", "CRYPT OF ETERNAL SLEEP", "SANCTUARY OF RA"],
+        };
+        //wypelnie danych
+        const nameEl = document.getElementById("lc-level-name");
+        const scoreEl = document.getElementById("lc-score");
+        const highscoreEl = document.getElementById("lc-highscore");
+        if (nameEl) nameEl.textContent = levelNames[currentLang][currentLevel - 1] || "LEVEL " + currentLevel;
+        if (scoreEl) scoreEl.textContent = score;
+        if (highscoreEl) highscoreEl.textContent = highScore;
+    
+            //blokowanie przycisku next jesli to ostatni poziom
+        const btnNext = document.getElementById("lc-btn-next");
+        if (currentLevel >= 4) {
+            btnNext.classList.add("disabled");
+        } else {
+            btnNext.classList.remove("disabled");
+        }
+
+        //poazuje overlay
+        gamePaused = true;
+        document.getElementById("level-complete-overlay").classList.add("active");
+    }
+
+
+        //obsluga przycisku next w ekranie ukończenia poziomu
+        document.getElementById("lc-btn-next").addEventListener("click", function() {
+            document.getElementById("level-complete-overlay").classList.remove("active");
+            gamePaused = false;
+            if (currentLevel < 4) {
+                currentLevel++;
+                score = 0;
+                riddlesSolved = 0;
+                loadLevel(currentLevel);
+                initEnemies();
+            }
+        });
+
+        //wybór poziomu
+        document.getElementById("lc-btn-levels").addEventListener("click", function() {
+        document.getElementById("level-complete-overlay").classList.remove("active");
+        document.getElementById("game-wrapper").style.display = "none";
+        document.getElementById("level-select-screen").style.display = "flex";
+        gamePaused = false;
+        
+        });
+        //menu główne
+        document.getElementById("lc-btn-menu").addEventListener("click", function() {
+            document.getElementById("level-complete-overlay").classList.remove("active");
+            document.getElementById("game-wrapper").style.display = "none";
+            document.getElementById("start-screen").style.display = "flex";
+            gamePaused = false;
+            score = 0;
+        });
+    
+
+
     if (playerRow === exit.row && playerCol === exit.col) {
         if (riddleSolved) {
             playSound(800, 0.5);
@@ -372,10 +433,10 @@ const translations = {
         noSave: "nie zapisałes zadnej gry",
         quitMSG: "Czy na pewno chcesz wyjsc?",
         levels: [
-    { label: "POZIOM 1", name: "Podziemia\nFaraona", desc: "Strach zaczyna się tutaj", req: "Ukończ poziom 1" },
-    { label: "POZIOM 2", name: "Komory\nZapomnianych", desc: "Lawa nie będzie czekać", req: "Ukończ poziom 2" },
-    { label: "POZIOM 3", name: "Krypta\nWiecznego Snu", desc: "Mgła pochłania wszystko", req: "Ukończ poziom 3" },
-    { label: "POZIOM 4", name: "Sanktuarium\nRa",        desc: "Ostateczny test",          req: "Ukończ poziom 4" },
+    { label: "POZIOM 1", name: "Podziemia\nFaraona", desc: "Strach zaczyna się tutaj" },
+    { label: "POZIOM 2", name: "Komory\nZapomnianych", desc: "Lawa nie będzie czekać", req: "Ukończ poziom 1" },
+    { label: "POZIOM 3", name: "Krypta\nWiecznego Snu", desc: "Mgła pochłania wszystko", req: "Ukończ poziom 2" },
+    { label: "POZIOM 4", name: "Sanktuarium\nRa",        desc: "Ostateczny test",          req: "Ukończ poziom 3" },
 ],
     },
     EN:{
