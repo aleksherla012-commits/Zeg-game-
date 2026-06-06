@@ -14,7 +14,8 @@ function initEnemies() {
             { dr:  0, dc:  1 },
         ];
 
-        for (const e of enemies) {
+        for (let ei = 0; ei < enemies.length; ei++) {
+            const e = enemies[ei];
             const losowy = kierunki[Math.floor(Math.random() * 4)];
             const newRow = e.row + losowy.dr;
             const newCol = e.col + losowy.dc;
@@ -22,6 +23,7 @@ function initEnemies() {
             if (canMove(newRow, newCol)) {
                 e.row = newRow;
                 e.col = newCol;
+                if (typeof updateEnemyDir === "function") updateEnemyDir(ei, losowy.dr, losowy.dc);
             }
             // jeśli dotknął gracza — zabiera HP
             if (e.row === playerRow && e.col === playerCol) {
