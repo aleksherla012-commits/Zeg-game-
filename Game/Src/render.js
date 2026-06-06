@@ -1,7 +1,7 @@
 // canvas
 const canvas_element = document.getElementById("canvas_gry");
 const canvas_context  = canvas_element.getContext("2d");
-canvas_context.imageSmoothingEnabled = true;
+canvas_context.imageSmoothingEnabled = false;
 
 const heartImg = new Image();
 heartImg.src = "Assets/heart.png";
@@ -15,10 +15,22 @@ keyImgs[2].src = "Assets/red_key.png";
 keyImgs[3].src = "Assets/green_key.png";
 
 // sprite'y środowiska
-const floorImg      = new Image(); floorImg.src      = "Assets/podloga_piaskowiec.png";
-const floorCrackImg = new Image(); floorCrackImg.src = "Assets/zlamana_podloga.png";
+const floorImg      = new Image(); floorImg.src      = "Assets/pod.png";
+const wallImg       = new Image(); wallImg.src       = "Assets/sciana.png";
+const floorCrackImg = new Image(); floorCrackImg.src = "Assets/pod.png";
 const ballImg       = new Image(); ballImg.src       = "Assets/kula.png";
-const lavaImg = new Image(); lavaImg.src = "Assets/lawa.png";
+const lavaImg       = new Image(); lavaImg.src       = "Assets/lawa.png";
+
+// sprite gracza
+const playerImg = new Image(); playerImg.src = "Assets/gracz.png";
+// sprite mumii (przeciwnik)
+const mumiaImg  = new Image(); mumiaImg.src  = "Assets/mumia.png";
+
+// sprite pułapek
+const ogienBaseImg       = new Image(); ogienBaseImg.src       = "Assets/ogien_baza.png";
+const ogienSheetImg      = new Image(); ogienSheetImg.src      = "Assets/ogien_spritesheet.png";
+const kolceBaseImg       = new Image(); kolceBaseImg.src       = "Assets/kolce_baza.png";
+const kolceSheetImg      = new Image(); kolceSheetImg.src      = "Assets/kolce_spritesheet.png";
 
 // klatka animacji kuli (0-3) — aktualizowana w enemies.js
 let ballFrame = 0;
@@ -27,24 +39,50 @@ let lavaFrame = 0;
 const BALL_FRAMES = 4;
 const BALL_COLS = 2; // sprite sheet 2x2
 
+// klatka animacji pułapek (0-3) — aktualizowana w gameLoop
+let trapFrame = 0;
+let trapFrameTimer = 0;
+const TRAP_FRAME_INTERVAL_BASE = 8;  // lvl 1-2: szybka animacja
+const TRAP_FRAME_INTERVAL_SLOW = 24; // lvl 3-4: wolniejsza, ale dłużej widoczna aktywacja
+
+// kierunek gracza: 0=dół, 1=lewo, 2=góra, 3=prawo  (wiersze spritesheet 4x4)
+let playerDir = 0;
+let playerWalkFrame = 0; // 0-3 kolumna w spritesheet
+let playerMoveTimer = 0;
+let playerIsMoving = false; // true tylko gdy pixel position != target
+const PLAYER_FRAME_INTERVAL = 3; // szybsza zmiana klatek chodu gracza
+
+// kierunek mumii: 0=dół, 1=lewo, 2=góra, 3=prawo
+// pixelX/Y — interpolowana pozycja mumii do płynnego ruchu
+let mumiaAnimFrames = {}; // per enemy index: { dir, frame, timer, walkTimer, pixelX, pixelY, targetX, targetY }
+
 // ---- rysuje labirynt ----
 function drawMaze() {
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             if (maze[i][j] === 1) {
-                canvas_context.fillStyle = "black";
-                // +1px zeby nie bylo szczelin miedzy kafle
+                // ściana — tekstura + ciemna nakładka żeby odróżnić od podłogi
+                if (wallImg.complete && wallImg.naturalWidth > 0) {
+                    canvas_context.drawImage(wallImg, j * cellSize, i * cellSize, cellSize, cellSize);
+                } else {
+                    canvas_context.fillStyle = "#1a0e05";
+                    canvas_context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                }
+                // nakładka przyciemniająca ścianę — wyraźnie ciemniejsza niż podłoga
+                canvas_context.fillStyle = "rgba(0,0,0,0.52)";
                 canvas_context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
             } else {
-                // losowo mieszaj tekstury podlogi dla urozmaicenia (deterministycznie per komorka)
-                const useCrack = ((i * 7 + j * 13) % 5 === 0) && floorCrackImg.complete && floorCrackImg.naturalWidth > 0;
-                const img = useCrack ? floorCrackImg : floorImg;
+                // podłoga — tekstura + lekkie rozjaśnienie ciepłym tonem
+                const img = floorImg;
                 if (img.complete && img.naturalWidth > 0) {
                     canvas_context.drawImage(img, j * cellSize, i * cellSize, cellSize, cellSize);
                 } else {
-                    canvas_context.fillStyle = "#e8d090";
+                    canvas_context.fillStyle = "#f0d898";
                     canvas_context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
                 }
+                // delikatna ciepła nakładka rozjaśniająca podłogę
+                canvas_context.fillStyle = "rgba(255,220,120,0.18)";
+                canvas_context.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
             }
         }
     }
@@ -61,14 +99,21 @@ function drawMaze() {
     canvas_context.fillStyle = "gold";
     canvas_context.fillRect(exit.col * cellSize, exit.row * cellSize, cellSize, cellSize);
 
-    // pulapki — czerwone (widoczne) lub ciemny odcien (ukryte na lvl 3)
-    for (const trap of traps) {
+    // pulapki — ogień lub kolce (naprzemiennie per index), ukryte = delikatna nakładka
+    for (let ti = 0; ti < traps.length; ti++) {
+        const trap = traps[ti];
         if (trap.hidden) {
-            canvas_context.fillStyle = "rgba(0,0,0,0.22)";
+            // nakładka 0.25 — ledwo widoczna ciemność na podłodze
+            canvas_context.fillStyle = "rgba(0,0,0,0.25)";
             canvas_context.fillRect(trap.col * cellSize, trap.row * cellSize, cellSize, cellSize);
         } else {
-            canvas_context.fillStyle = "red";
-            canvas_context.fillRect(trap.col * cellSize, trap.row * cellSize, cellSize, cellSize);
+            const onTrap = (playerRow === trap.row && playerCol === trap.col);
+            // naprzemiennie: parzyste = ogień, nieparzyste = kolce
+            if (ti % 2 === 0) {
+                drawTrapFire(trap.col * cellSize, trap.row * cellSize, onTrap);
+            } else {
+                drawTrapSpikes(trap.col * cellSize, trap.row * cellSize, onTrap);
+            }
         }
     }
 
@@ -80,6 +125,48 @@ function drawMaze() {
     // zrodlo lavy
     for (const fb of fireballs) {
         drawLavaPool(fb.lavaCol * cellSize, fb.lavaRow * cellSize, cellSize);
+    }
+}
+
+// ---- pułapka ogień ----
+// playerOnTrap: true gdy gracz stoi na tej pułapce — wtedy animacja, inaczej tylko baza
+function drawTrapFire(x, y, playerOnTrap) {
+    if (ogienBaseImg.complete && ogienBaseImg.naturalWidth > 0) {
+        canvas_context.drawImage(ogienBaseImg, x, y, cellSize, cellSize);
+    } else {
+        canvas_context.fillStyle = "rgba(255,80,0,0.4)";
+        canvas_context.fillRect(x, y, cellSize, cellSize);
+    }
+    // animowany płomień tylko gdy gracz stoi na pułapce
+    if (playerOnTrap && ogienSheetImg.complete && ogienSheetImg.naturalWidth > 0) {
+        const totalFrames = 5;
+        const fw = ogienSheetImg.naturalWidth / totalFrames;
+        const fh = ogienSheetImg.naturalHeight;
+        const frame = trapFrame % totalFrames;
+        canvas_context.drawImage(ogienSheetImg,
+            frame * fw, 0, fw, fh,
+            x, y, cellSize, cellSize);
+    }
+}
+
+// ---- pułapka kolce ----
+// playerOnTrap: true gdy gracz stoi na tej pułapce — wtedy animacja, inaczej tylko baza
+function drawTrapSpikes(x, y, playerOnTrap) {
+    if (kolceBaseImg.complete && kolceBaseImg.naturalWidth > 0) {
+        canvas_context.drawImage(kolceBaseImg, x, y, cellSize, cellSize);
+    } else {
+        canvas_context.fillStyle = "rgba(180,180,180,0.4)";
+        canvas_context.fillRect(x, y, cellSize, cellSize);
+    }
+    // animowane kolce tylko gdy gracz stoi na pułapce
+    if (playerOnTrap && kolceSheetImg.complete && kolceSheetImg.naturalWidth > 0) {
+        const totalFrames = 5;
+        const fw = kolceSheetImg.naturalWidth / totalFrames;
+        const fh = kolceSheetImg.naturalHeight;
+        const frame = trapFrame % totalFrames;
+        canvas_context.drawImage(kolceSheetImg,
+            frame * fw, 0, fw, fh,
+            x, y, cellSize, cellSize);
     }
 }
 
@@ -121,7 +208,6 @@ function drawFireballs() {
         }
 
         if (ballImg.complete && ballImg.naturalWidth > 0) {
-            // sprite sheet 2x2 — wybierz klatke
             const frameW = ballImg.naturalWidth / 2;
             const frameH = ballImg.naturalHeight / 2;
             const srcX = (ballFrame % 2) * frameW;
@@ -136,35 +222,144 @@ function drawFireballs() {
     }
 }
 
-// ---- rysuje przeciwnikow ----
+// ---- rysuje przeciwnikow (mumie) ----
+const MUMMY_ROWS = 4;
+const MUMMY_COLS = 4;
+const MUMMY_FRAME_INTERVAL = 8;  // co ile klatek renderu zmiana klatki chodu mumii
+const MUMMY_ANIM_SPEED = 0.18;   // plynnosc interpolacji pozycji mumii (0-1)
+
 function drawEnemies() {
-    const kolory = ["orange", "purple", "#00e5ff"];
-    const margin = 5;
     for (let i = 0; i < enemies.length; i++) {
-        canvas_context.fillStyle = kolory[i % kolory.length];
+        const e = enemies[i];
+
+        // inicjalizacja stanu animacji mumii
+        if (!mumiaAnimFrames[i]) {
+            mumiaAnimFrames[i] = {
+                dir: 0, frame: 0, walkTimer: 0,
+                pixelX: e.col * cellSize,
+                pixelY: e.row * cellSize,
+                targetX: e.col * cellSize,
+                targetY: e.row * cellSize,
+                isMoving: false
+            };
+        }
+        const anim = mumiaAnimFrames[i];
+
+        // aktualizuj cel pozycji piksela do biezacej pozycji siatki
+        anim.targetX = e.col * cellSize;
+        anim.targetY = e.row * cellSize;
+
+        // plynna interpolacja pozycji (lerp)
+        anim.pixelX += (anim.targetX - anim.pixelX) * MUMMY_ANIM_SPEED;
+        anim.pixelY += (anim.targetY - anim.pixelY) * MUMMY_ANIM_SPEED;
+
+        // czy mumia sie porusza (interpolacja w toku)?
+        anim.isMoving = Math.abs(anim.targetX - anim.pixelX) > 1.0 ||
+                        Math.abs(anim.targetY - anim.pixelY) > 1.0;
+
+        // klatka chodu — niezalezny od tickow wroga, na podstawie isMoving
+        if (anim.isMoving) {
+            anim.walkTimer++;
+            if (anim.walkTimer >= MUMMY_FRAME_INTERVAL) {
+                anim.walkTimer = 0;
+                anim.frame = (anim.frame + 1) % MUMMY_COLS;
+            }
+        } else {
+            anim.frame = 0;
+            anim.walkTimer = 0;
+        }
+
+        if (mumiaImg.complete && mumiaImg.naturalWidth > 0) {
+            // kolumna = kierunek, wiersz = klatka animacji
+            const fw = mumiaImg.naturalWidth  / MUMMY_COLS;
+            const fh = mumiaImg.naturalHeight / MUMMY_ROWS;
+            const srcX = anim.dir   * fw; // kierunek → kolumna
+            const srcY = anim.frame * fh; // klatka   → wiersz
+            canvas_context.drawImage(mumiaImg,
+                srcX, srcY, fw, fh,
+                anim.pixelX, anim.pixelY, cellSize, cellSize);
+        } else {
+            const kolory = ["orange", "purple", "#00e5ff"];
+            const margin = 5;
+            canvas_context.fillStyle = kolory[i % kolory.length];
+            canvas_context.fillRect(
+                anim.pixelX + margin,
+                anim.pixelY + margin,
+                cellSize - margin * 2,
+                cellSize - margin * 2
+            );
+        }
+    }
+}
+
+// ---- aktualizuje kierunek mumii (wywolaj z enemies.js przy ruchu) ----
+// Kierunek mumii → kolumna w mumia.png
+// col 0=dol(przod), col 1=lewo, col 2=gora(plecy), col 3=prawo
+function updateEnemyDir(idx, dr, dc) {
+    if (!mumiaAnimFrames[idx]) mumiaAnimFrames[idx] = {
+        dir: 0, frame: 0, walkTimer: 0,
+        pixelX: 0, pixelY: 0, targetX: 0, targetY: 0, isMoving: false
+    };
+    if      (dr ===  1) mumiaAnimFrames[idx].dir = 0; // dol   → kolumna 0
+    else if (dc === -1) mumiaAnimFrames[idx].dir = 1; // lewo  → kolumna 1
+    else if (dr === -1) mumiaAnimFrames[idx].dir = 2; // gora  → kolumna 2
+    else if (dc ===  1) mumiaAnimFrames[idx].dir = 3; // prawo → kolumna 3
+}
+
+// ---- rysuje gracza ze spritesheetem ----
+// gracz.png: 4 wiersze (dół, lewo, góra, prawo) x 4 kolumny (klatki chodu)
+const PLAYER_ROWS = 4;
+const PLAYER_COLS = 4;
+
+function drawPlayer() {
+    playerPixelX += (playerTargetX - playerPixelX) * animSpeed;
+    playerPixelY += (playerTargetY - playerPixelY) * animSpeed;
+
+    // poruszanie sie — sprawdz czy pixel blizej niz 1px do celu
+    playerIsMoving = Math.abs(playerTargetX - playerPixelX) > 1.5 || Math.abs(playerTargetY - playerPixelY) > 1.5;
+
+    if (playerIsMoving) {
+        playerMoveTimer++;
+        if (playerMoveTimer >= PLAYER_FRAME_INTERVAL) {
+            playerMoveTimer = 0;
+            playerWalkFrame = (playerWalkFrame + 1) % PLAYER_COLS;
+        }
+    } else {
+        // stoi — klatka 0, zachowaj ostatni kierunek (nie resetuj do dołu)
+        playerWalkFrame = 0;
+        playerMoveTimer = 0;
+    }
+
+    if (playerImg.complete && playerImg.naturalWidth > 0) {
+        // kolumna = kierunek, wiersz = klatka animacji
+        const fw = playerImg.naturalWidth  / PLAYER_COLS; // szerokosc jednej klatki
+        const fh = playerImg.naturalHeight / PLAYER_ROWS; // wysokosc jednej klatki
+        const srcX = playerDir       * fw; // kierunek → kolumna
+        const srcY = playerWalkFrame * fh; // klatka   → wiersz
+        canvas_context.drawImage(playerImg,
+            srcX, srcY, fw, fh,
+            playerPixelX, playerPixelY, cellSize, cellSize);
+    } else {
+        const margin = 5;
+        canvas_context.fillStyle = "blue";
         canvas_context.fillRect(
-            enemies[i].col * cellSize + margin,
-            enemies[i].row * cellSize + margin,
+            playerPixelX + margin,
+            playerPixelY + margin,
             cellSize - margin * 2,
             cellSize - margin * 2
         );
     }
 }
 
-// ---- rysuje gracza ----
-function drawPlayer() {
-    playerPixelX += (playerTargetX - playerPixelX) * animSpeed;
-    playerPixelY += (playerTargetY - playerPixelY) * animSpeed;
-    const margin = 5;
-    canvas_context.fillStyle = "blue";
-    canvas_context.fillRect(
-        playerPixelX + margin,
-        playerPixelY + margin,
-        cellSize - margin * 2,
-        cellSize - margin * 2
-    );
+// ---- aktualizuje kierunek gracza (wywołaj z app.js przy ruchu) ----
+// Kierunek gracza → kolumna w gracz.png
+// col 0=dol(przod), col 1=lewo, col 2=gora(plecy), col 3=prawo
+function updatePlayerDir(dr, dc) {
+    if      (dr ===  1) playerDir = 0; // dol   → kolumna 0
+    else if (dc === -1) playerDir = 1; // lewo  → kolumna 1
+    else if (dr === -1) playerDir = 2; // gora  → kolumna 2
+    else if (dc ===  1) playerDir = 3; // prawo → kolumna 3
 }
-
 
 // ---- rysuje przedmioty ----
 function drawItems() {
@@ -271,8 +466,6 @@ function drawGameOver() {
     canvas_context.textAlign = "left";
 }
 
-
-   
 // ---- mgla wojny (level 3+) ----
 function drawFog() {
     const fogRadius = 4;
@@ -293,6 +486,15 @@ function drawFog() {
 // ---- glowna funkcja render ----
 function render() {
     canvas_context.clearRect(0, 0, canvas_element.width, canvas_element.height);
+
+    // animacja pułapek — timer globalny, wolniejszy na lvl 3+ (dłużej widać aktywację)
+    const trapInterval = (currentLevel >= 3) ? TRAP_FRAME_INTERVAL_SLOW : TRAP_FRAME_INTERVAL_BASE;
+    trapFrameTimer++;
+    if (trapFrameTimer >= trapInterval) {
+        trapFrameTimer = 0;
+        trapFrame = (trapFrame + 1) % 5;
+    }
+
     drawMaze();
     drawItems();
     drawFireballs();
@@ -326,7 +528,6 @@ function updateHUD() {
     const keysEl = document.getElementById("hud-keys");
     if (keysEl) {
         const keyItems = items.filter(i => i.type === "key");
-        // odbuduj tylko jeśli liczba slotów się zmieniła
         if (keysEl.children.length !== keyItems.length) {
             keysEl.innerHTML = "";
             keyItems.forEach(function(item) {
@@ -340,7 +541,6 @@ function updateHUD() {
                 keysEl.appendChild(slot);
             });
         }
-        // aktualizuj zebrane
         keyItems.forEach(function(item) {
             const slot = keysEl.querySelector("[data-key-id='" + item.keyId + "']");
             if (!slot) return;
