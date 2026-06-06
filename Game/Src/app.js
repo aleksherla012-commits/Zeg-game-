@@ -23,10 +23,12 @@ document.addEventListener("keydown", function (event) {
 
     if (gamePaused) return;
 
-    if (event.key === "w" || event.key === "ArrowUp")    newRow--;
-    if (event.key === "s" || event.key === "ArrowDown")  newRow++;
-    if (event.key === "a" || event.key === "ArrowLeft")  newCol--;
-    if (event.key === "d" || event.key === "ArrowRight") newCol++;
+    let dr = 0, dc = 0;
+    if (event.key === "w" || event.key === "ArrowUp")    { newRow--; dr = -1; }
+    if (event.key === "s" || event.key === "ArrowDown")  { newRow++; dr =  1; }
+    if (event.key === "a" || event.key === "ArrowLeft")  { newCol--; dc = -1; }
+    if (event.key === "d" || event.key === "ArrowRight") { newCol++; dc =  1; }
+    if (dr !== 0 || dc !== 0) updatePlayerDir(dr, dc);
 
     const blockedDoor = doors.find(d => !d.open && d.row === newRow && d.col === newCol);
     if (blockedDoor) {
