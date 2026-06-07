@@ -212,6 +212,8 @@ function loadLevel(level) {
     hp        = 3;
     riddleSolved = false;
     gameOver     = false;
+    // reset animacji mety
+    if (typeof metaOpened !== 'undefined') { metaOpened = false; metaFrame = 3; }
 }
 
 // ile zagadek gracz już rozwiązał
@@ -222,6 +224,6 @@ let playerPixelX=1*cellSize;
 let playerPixelY=1*cellSize;
 let playerTargetX=1*cellSize;
 let playerTargetY=1*cellSize;
-const animSpeed = 0.3; // 0.0-1.0, im wyżej tym szybszy ruch 
+const animSpeed = 0.20;  // plynna interpolacja — wolniejsza = dluzszy ruch = lepsza animacja nog
 
 let gamePaused = false;
