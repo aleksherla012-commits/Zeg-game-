@@ -27,7 +27,7 @@ const playerImg = new Image(); playerImg.src = "Assets/gracz.png";
 const zagadkaImg = new Image(); zagadkaImg.src = "Assets/zagadka.png";
 // sprite mumii (przeciwnik)
 const mumiaImg  = new Image(); mumiaImg.src  = "Assets/mumia.png";
-// sprite mety (skrzynia) — 4 klatki: [klejnoty, zloto, zamknieta_uchylona, zamknieta]
+const doorImg = new Image(); doorImg.src = "Assets/drzwi.png";
 const metaImg = new Image(); metaImg.src = "Assets/meta.png";
 let metaFrame = 3;        // startuje od zamknietej (klatka 3)
 let metaOpened = false;   // czy gracz juz wszedl na mete
@@ -119,9 +119,9 @@ function drawMaze() {
         metaFrame--;
         metaLastTime = now_meta;
     }
-    const mSize = cellSize * 2; // skrzynia 2x wieksza
-    const mx = exit.col * cellSize - cellSize / 2; // wyśrodkuj
-    const my = exit.row * cellSize - cellSize / 2;
+    const mSize = Math.round(cellSize * 1.6);
+    const mx = exit.col * cellSize + Math.round((cellSize - mSize) / 2) + 6;
+    const my = exit.row * cellSize + Math.round((cellSize - mSize) / 2);
     if (metaImg.complete && metaImg.naturalWidth > 0) {
         const fw = metaImg.naturalWidth / META_FRAMES;
         canvas_context.drawImage(metaImg, metaFrame * fw, 0, fw, metaImg.naturalHeight,
@@ -151,7 +151,19 @@ function drawMaze() {
 
     // drzwi
     for (const door of doors) {
-        if (!door.open) drawPixelDoor(door.col * cellSize, door.row * cellSize, cellSize);
+        if (door.open) {
+            if (door.openFrame === undefined) door.openFrame = 0;
+            if (door.openTimer === undefined) door.openTimer = 0;
+            if (door.openFrame < 2) {
+                door.openTimer++;
+                if (door.openTimer > 8) { door.openTimer = 0; door.openFrame++; }
+            }
+            drawPixelDoor(door.col * cellSize, door.row * cellSize, cellSize, door.openFrame);
+        } else {
+            door.openFrame = 0;
+            door.openTimer = 0;
+            drawPixelDoor(door.col * cellSize, door.row * cellSize, cellSize, 0);
+        }
     }
 
     // zrodlo lavy
@@ -202,14 +214,25 @@ function drawTrapSpikes(x, y, playerOnTrap) {
     }
 }
 
-// drzwi — braz + zlota klamka
-function drawPixelDoor(x, y, s) {
-    canvas_context.fillStyle = "#8B4513";
+// drzwi — sprite drzwi.png (3 klatki: 0=zamknięte, 1=uchylone, 2=otwarte)
+function drawPixelDoor(x, y, s, frame) {
+    frame = frame || 0;
+    if (floorImg.complete && floorImg.naturalWidth > 0) {
+        canvas_context.drawImage(floorImg, x, y, s, s);
+    }
+    canvas_context.fillStyle = "rgba(255,220,120,0.18)";
     canvas_context.fillRect(x, y, s, s);
-    canvas_context.fillStyle = "#FFD700";
-    canvas_context.beginPath();
-    canvas_context.arc(x + s - 8, y + s / 2, 3, 0, Math.PI * 2);
-    canvas_context.fill();
+    if (frame >= 2) return; // w pełni otwarte — tylko podłoga widoczna
+    if (doorImg.complete && doorImg.naturalWidth > 0) {
+        const fw = doorImg.naturalWidth / 3;
+        const dSize = Math.round(s * 1.1);
+        const dx = x + Math.round((s - dSize) / 2);
+        const dy = y + Math.round((s - dSize) / 2);
+        canvas_context.drawImage(doorImg, frame * fw, 0, fw, doorImg.naturalHeight, dx, dy, dSize, dSize);
+    } else {
+        canvas_context.fillStyle = "#8B4513";
+        canvas_context.fillRect(x, y, s, s);
+    }
 }
 
 // lawa
@@ -257,8 +280,8 @@ function drawFireballs() {
 // ---- rysuje przeciwnikow (mumie) ----
 const MUMMY_ROWS = 4;
 const MUMMY_COLS = 4;
-const MUMMY_FRAME_INTERVAL = 3;  // zmiana klatki nogi co 3 klatki renderu
-const MUMMY_MOVE_MS = 380;       // czas trwania jednego kroku mumii w ms (< interwalu 500ms)
+const MUMMY_FRAME_INTERVAL = 2;  // zmiana klatki nogi co 2 klatki renderu
+const MUMMY_MOVE_MS = 460;       // prawie cały interwał — minimalna pauza między krokami
 
 function drawEnemies() {
     const now = performance.now();
@@ -280,8 +303,16 @@ function drawEnemies() {
         }
         const anim = mumiaAnimFrames[i];
 
-        // nowy ruch siatki — zaktualizuj from/to
+        // nowy ruch siatki — zaktualizuj from/to i kierunek od razu
         if (e.col !== anim.lastCol || e.row !== anim.lastRow) {
+            const moveDc = e.col - anim.lastCol;
+            const moveDr = e.row - anim.lastRow;
+            // ustaw kierunek TERAZ — nie czekaj na updateEnemyDir
+            if      (moveDr ===  1) { anim.dir = 0; anim.flip = false; }
+            else if (moveDc ===  1) { anim.dir = 1; anim.flip = true;  }
+            else if (moveDr === -1) { anim.dir = 2; anim.flip = false; }
+            else if (moveDc === -1) { anim.dir = 1; anim.flip = false; }
+
             anim.fromX    = anim.pixelX !== undefined ? anim.pixelX : anim.toX;
             anim.fromY    = anim.pixelY !== undefined ? anim.pixelY : anim.toY;
             anim.toX      = e.col * cellSize;
@@ -296,13 +327,13 @@ function drawEnemies() {
         anim.pixelX = anim.fromX + (anim.toX - anim.fromX) * t;
         anim.pixelY = anim.fromY + (anim.toY - anim.fromY) * t;
 
-        // animacja nog: chodzi podczas ruchu (t < 1)
+        // animacja nog: chodzi podczas ruchu (t < 1), stoi na klatce 0 gdy czeka
         const isMoving = t < 1;
         if (isMoving) {
             anim.walkTimer++;
             if (anim.walkTimer >= MUMMY_FRAME_INTERVAL) {
                 anim.walkTimer = 0;
-                anim.frame = (anim.frame + 1) % MUMMY_COLS;
+                anim.frame = (anim.frame + 1) % WALK_CYCLE.length;
             }
         } else {
             anim.frame = 0;
@@ -312,8 +343,8 @@ function drawEnemies() {
         if (mumiaImg.complete && mumiaImg.naturalWidth > 0) {
             const fw = mumiaImg.naturalWidth  / MUMMY_COLS;
             const fh = mumiaImg.naturalHeight / MUMMY_ROWS;
-            const srcX = anim.frame * fw;
-            const srcY = anim.dir   * fh;
+            const srcX = WALK_CYCLE[anim.frame] * fw; // klatka chodu → kolumna
+            const srcY = anim.dir               * fh; // kierunek     → wiersz
             if (anim.flip) {
                 canvas_context.save();
                 canvas_context.translate(anim.pixelX + cellSize, anim.pixelY);
@@ -365,6 +396,9 @@ const PLAYER_MOVE_MS = 220;      // czas trwania jednego kroku gracza w ms — d
 let playerFromX = cellSize, playerFromY = cellSize;
 let playerMoveStart = 0;
 
+const WALK_CYCLE = [0, 1, 2, 1];
+const PLAYER_WALK_CYCLE = [0, 1, 2, 1];
+
 function drawPlayer() {
     const now = performance.now();
 
@@ -381,7 +415,7 @@ function drawPlayer() {
         playerMoveTimer++;
         if (playerMoveTimer >= PLAYER_FRAME_INTERVAL) {
             playerMoveTimer = 0;
-            playerWalkFrame = (playerWalkFrame + 1) % PLAYER_COLS;
+            playerWalkFrame = (playerWalkFrame + 1) % PLAYER_WALK_CYCLE.length;
         }
     } else {
         playerWalkFrame = 0;
@@ -391,10 +425,9 @@ function drawPlayer() {
     if (playerImg.complete && playerImg.naturalWidth > 0) {
         const fw = playerImg.naturalWidth  / PLAYER_COLS;
         const fh = playerImg.naturalHeight / PLAYER_ROWS;
-        const srcX = playerDir       * fw; // kierunek → kolumna
-        const srcY = playerWalkFrame * fh; // klatka   → wiersz
-        canvas_context.drawImage(playerImg,
-            srcX, srcY, fw, fh,
+        const srcX = playerDir                    * fw; // kierunek → kolumna
+        const srcY = PLAYER_WALK_CYCLE[playerWalkFrame] * fh; // klatka → wiersz
+        canvas_context.drawImage(playerImg, srcX, srcY, fw, fh,
             playerPixelX, playerPixelY, cellSize, cellSize);
     } else {
         const margin = 5;
