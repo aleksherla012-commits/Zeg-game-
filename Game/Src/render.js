@@ -23,8 +23,17 @@ const lavaImg       = new Image(); lavaImg.src       = "Assets/lawa.png";
 
 // sprite gracza
 const playerImg = new Image(); playerImg.src = "Assets/gracz.png";
+// ikona zagadki w HUD
+const zagadkaImg = new Image(); zagadkaImg.src = "Assets/zagadka.png";
 // sprite mumii (przeciwnik)
 const mumiaImg  = new Image(); mumiaImg.src  = "Assets/mumia.png";
+// sprite mety (skrzynia) — 4 klatki: [klejnoty, zloto, zamknieta_uchylona, zamknieta]
+const metaImg = new Image(); metaImg.src = "Assets/meta.png";
+let metaFrame = 3;        // startuje od zamknietej (klatka 3)
+let metaOpened = false;   // czy gracz juz wszedl na mete
+let metaLastTime = 0;
+const META_FRAMES = 4;
+const META_FRAME_MS = 160;
 
 // sprite pułapek
 const ogienBaseImg       = new Image(); ogienBaseImg.src       = "Assets/ogien_baza.png";
@@ -42,15 +51,14 @@ const BALL_COLS = 2; // sprite sheet 2x2
 // klatka animacji pułapek (0-3) — aktualizowana w gameLoop
 let trapFrame = 0;
 let trapFrameTimer = 0;
-const TRAP_FRAME_INTERVAL_BASE = 8;  // lvl 1-2: szybka animacja
-const TRAP_FRAME_INTERVAL_SLOW = 24; // lvl 3-4: wolniejsza, ale dłużej widoczna aktywacja
+const TRAP_FRAME_INTERVAL_BASE = 16;  // lvl 1-2: wolniejsza, kazda klatka lepiej widoczna
+const TRAP_FRAME_INTERVAL_SLOW = 32;  // lvl 3-4: bardzo wolna, dlugo widac aktywacje
 
 // kierunek gracza: 0=dół, 1=lewo, 2=góra, 3=prawo  (wiersze spritesheet 4x4)
 let playerDir = 0;
 let playerWalkFrame = 0; // 0-3 kolumna w spritesheet
 let playerMoveTimer = 0;
-let playerIsMoving = false; // true tylko gdy pixel position != target
-const PLAYER_FRAME_INTERVAL = 3; // szybsza zmiana klatek chodu gracza
+let playerWalkTicks = 0;   // zachowane dla kompatybilnosci z app.js
 
 // kierunek mumii: 0=dół, 1=lewo, 2=góra, 3=prawo
 // pixelX/Y — interpolowana pozycja mumii do płynnego ruchu
@@ -87,17 +95,41 @@ function drawMaze() {
         }
     }
 
-    // blok przed meta gdy zagadki nierozwiazane
+    // blok przed meta gdy zagadki nierozwiazane — tekstura sciany
     if (!riddleSolved) {
-        canvas_context.fillStyle = "black";
-        canvas_context.fillRect(
-            (exit.col - 1) * cellSize, exit.row * cellSize, cellSize + 1, cellSize + 1
-        );
+        const bx = (exit.col - 1) * cellSize;
+        const by = exit.row * cellSize;
+        if (wallImg.complete && wallImg.naturalWidth > 0) {
+            canvas_context.drawImage(wallImg, bx, by, cellSize, cellSize);
+        }
+        // ciemna nakladka identyczna jak sciany
+        canvas_context.fillStyle = "rgba(0,0,0,0.52)";
+        canvas_context.fillRect(bx, by, cellSize, cellSize);
     }
 
-    // meta
-    canvas_context.fillStyle = "gold";
-    canvas_context.fillRect(exit.col * cellSize, exit.row * cellSize, cellSize, cellSize);
+    // meta — animowana skrzynia, wieksza (2x cellSize), otwiera sie gdy gracz wejdzie
+    const now_meta = performance.now();
+    // otwarcie: gdy gracz stoi na mecie — animuj od klatki 3 do 0
+    if (playerRow === exit.row && playerCol === exit.col && !metaOpened) {
+        metaOpened = true;
+        metaFrame = 3;
+        metaLastTime = now_meta;
+    }
+    if (metaOpened && metaFrame > 0 && now_meta - metaLastTime > META_FRAME_MS) {
+        metaFrame--;
+        metaLastTime = now_meta;
+    }
+    const mSize = cellSize * 2; // skrzynia 2x wieksza
+    const mx = exit.col * cellSize - cellSize / 2; // wyśrodkuj
+    const my = exit.row * cellSize - cellSize / 2;
+    if (metaImg.complete && metaImg.naturalWidth > 0) {
+        const fw = metaImg.naturalWidth / META_FRAMES;
+        canvas_context.drawImage(metaImg, metaFrame * fw, 0, fw, metaImg.naturalHeight,
+            mx, my, mSize, mSize);
+    } else {
+        canvas_context.fillStyle = "gold";
+        canvas_context.fillRect(exit.col * cellSize, exit.row * cellSize, cellSize, cellSize);
+    }
 
     // pulapki — ogień lub kolce (naprzemiennie per index), ukryte = delikatna nakładka
     for (let ti = 0; ti < traps.length; ti++) {
@@ -225,40 +257,48 @@ function drawFireballs() {
 // ---- rysuje przeciwnikow (mumie) ----
 const MUMMY_ROWS = 4;
 const MUMMY_COLS = 4;
-const MUMMY_FRAME_INTERVAL = 8;  // co ile klatek renderu zmiana klatki chodu mumii
-const MUMMY_ANIM_SPEED = 0.18;   // plynnosc interpolacji pozycji mumii (0-1)
+const MUMMY_FRAME_INTERVAL = 3;  // zmiana klatki nogi co 3 klatki renderu
+const MUMMY_MOVE_MS = 380;       // czas trwania jednego kroku mumii w ms (< interwalu 500ms)
 
 function drawEnemies() {
+    const now = performance.now();
     for (let i = 0; i < enemies.length; i++) {
         const e = enemies[i];
 
         // inicjalizacja stanu animacji mumii
         if (!mumiaAnimFrames[i]) {
             mumiaAnimFrames[i] = {
-                dir: 0, frame: 0, walkTimer: 0,
-                pixelX: e.col * cellSize,
-                pixelY: e.row * cellSize,
-                targetX: e.col * cellSize,
-                targetY: e.row * cellSize,
-                isMoving: false
+                dir: 0, frame: 0, walkTimer: 0, flip: false,
+                fromX: e.col * cellSize,
+                fromY: e.row * cellSize,
+                toX:   e.col * cellSize,
+                toY:   e.row * cellSize,
+                moveStart: now,
+                lastCol: e.col,
+                lastRow: e.row,
             };
         }
         const anim = mumiaAnimFrames[i];
 
-        // aktualizuj cel pozycji piksela do biezacej pozycji siatki
-        anim.targetX = e.col * cellSize;
-        anim.targetY = e.row * cellSize;
+        // nowy ruch siatki — zaktualizuj from/to
+        if (e.col !== anim.lastCol || e.row !== anim.lastRow) {
+            anim.fromX    = anim.pixelX !== undefined ? anim.pixelX : anim.toX;
+            anim.fromY    = anim.pixelY !== undefined ? anim.pixelY : anim.toY;
+            anim.toX      = e.col * cellSize;
+            anim.toY      = e.row * cellSize;
+            anim.moveStart = now;
+            anim.lastCol  = e.col;
+            anim.lastRow  = e.row;
+        }
 
-        // plynna interpolacja pozycji (lerp)
-        anim.pixelX += (anim.targetX - anim.pixelX) * MUMMY_ANIM_SPEED;
-        anim.pixelY += (anim.targetY - anim.pixelY) * MUMMY_ANIM_SPEED;
+        // liniowa interpolacja od from do to w MUMMY_MOVE_MS ms
+        const t = Math.min(1, (now - anim.moveStart) / MUMMY_MOVE_MS);
+        anim.pixelX = anim.fromX + (anim.toX - anim.fromX) * t;
+        anim.pixelY = anim.fromY + (anim.toY - anim.fromY) * t;
 
-        // czy mumia sie porusza (interpolacja w toku)?
-        anim.isMoving = Math.abs(anim.targetX - anim.pixelX) > 1.0 ||
-                        Math.abs(anim.targetY - anim.pixelY) > 1.0;
-
-        // klatka chodu — niezalezny od tickow wroga, na podstawie isMoving
-        if (anim.isMoving) {
+        // animacja nog: chodzi podczas ruchu (t < 1)
+        const isMoving = t < 1;
+        if (isMoving) {
             anim.walkTimer++;
             if (anim.walkTimer >= MUMMY_FRAME_INTERVAL) {
                 anim.walkTimer = 0;
@@ -270,14 +310,19 @@ function drawEnemies() {
         }
 
         if (mumiaImg.complete && mumiaImg.naturalWidth > 0) {
-            // kolumna = kierunek, wiersz = klatka animacji
             const fw = mumiaImg.naturalWidth  / MUMMY_COLS;
             const fh = mumiaImg.naturalHeight / MUMMY_ROWS;
-            const srcX = anim.dir   * fw; // kierunek → kolumna
-            const srcY = anim.frame * fh; // klatka   → wiersz
-            canvas_context.drawImage(mumiaImg,
-                srcX, srcY, fw, fh,
-                anim.pixelX, anim.pixelY, cellSize, cellSize);
+            const srcX = anim.frame * fw;
+            const srcY = anim.dir   * fh;
+            if (anim.flip) {
+                canvas_context.save();
+                canvas_context.translate(anim.pixelX + cellSize, anim.pixelY);
+                canvas_context.scale(-1, 1);
+                canvas_context.drawImage(mumiaImg, srcX, srcY, fw, fh, 0, 0, cellSize, cellSize);
+                canvas_context.restore();
+            } else {
+                canvas_context.drawImage(mumiaImg, srcX, srcY, fw, fh, anim.pixelX, anim.pixelY, cellSize, cellSize);
+            }
         } else {
             const kolory = ["orange", "purple", "#00e5ff"];
             const margin = 5;
@@ -298,42 +343,54 @@ function drawEnemies() {
 function updateEnemyDir(idx, dr, dc) {
     if (!mumiaAnimFrames[idx]) mumiaAnimFrames[idx] = {
         dir: 0, frame: 0, walkTimer: 0,
-        pixelX: 0, pixelY: 0, targetX: 0, targetY: 0, isMoving: false
+        pixelX: 0, pixelY: 0,
+        fromX: 0, fromY: 0, toX: 0, toY: 0,
+        lastCol: -999, lastRow: -999,
+        flip: false, moveStart: 0,
     };
-    if      (dr ===  1) mumiaAnimFrames[idx].dir = 0; // dol   → kolumna 0
-    else if (dc === -1) mumiaAnimFrames[idx].dir = 1; // lewo  → kolumna 1
-    else if (dr === -1) mumiaAnimFrames[idx].dir = 2; // gora  → kolumna 2
-    else if (dc ===  1) mumiaAnimFrames[idx].dir = 3; // prawo → kolumna 3
+    const a = mumiaAnimFrames[idx];
+    if      (dr ===  1) { a.dir = 0; a.flip = false; }
+    else if (dc ===  1) { a.dir = 1; a.flip = true;  }
+    else if (dr === -1) { a.dir = 2; a.flip = false; }
+    else if (dc === -1) { a.dir = 1; a.flip = false; }
 }
 
 // ---- rysuje gracza ze spritesheetem ----
 // gracz.png: 4 wiersze (dół, lewo, góra, prawo) x 4 kolumny (klatki chodu)
 const PLAYER_ROWS = 4;
 const PLAYER_COLS = 4;
+const PLAYER_FRAME_INTERVAL = 2; // zmiana klatki nogi co 2 klatki renderu
+const PLAYER_MOVE_MS = 220;      // czas trwania jednego kroku gracza w ms — dluzszy = wiecej klatek nog
+
+let playerFromX = cellSize, playerFromY = cellSize;
+let playerMoveStart = 0;
 
 function drawPlayer() {
-    playerPixelX += (playerTargetX - playerPixelX) * animSpeed;
-    playerPixelY += (playerTargetY - playerPixelY) * animSpeed;
+    const now = performance.now();
 
-    // poruszanie sie — sprawdz czy pixel blizej niz 1px do celu
-    playerIsMoving = Math.abs(playerTargetX - playerPixelX) > 1.5 || Math.abs(playerTargetY - playerPixelY) > 1.5;
+    // liniowa interpolacja gracza od fromX/Y do targetX/Y
+    const t = playerMoveStart > 0
+        ? Math.min(1, (now - playerMoveStart) / PLAYER_MOVE_MS)
+        : 1;
+    playerPixelX = playerFromX + (playerTargetX - playerFromX) * t;
+    playerPixelY = playerFromY + (playerTargetY - playerFromY) * t;
 
-    if (playerIsMoving) {
+    // animacja nog: chodzi podczas ruchu (t < 1)
+    const isMoving = t < 1;
+    if (isMoving) {
         playerMoveTimer++;
         if (playerMoveTimer >= PLAYER_FRAME_INTERVAL) {
             playerMoveTimer = 0;
             playerWalkFrame = (playerWalkFrame + 1) % PLAYER_COLS;
         }
     } else {
-        // stoi — klatka 0, zachowaj ostatni kierunek (nie resetuj do dołu)
         playerWalkFrame = 0;
         playerMoveTimer = 0;
     }
 
     if (playerImg.complete && playerImg.naturalWidth > 0) {
-        // kolumna = kierunek, wiersz = klatka animacji
-        const fw = playerImg.naturalWidth  / PLAYER_COLS; // szerokosc jednej klatki
-        const fh = playerImg.naturalHeight / PLAYER_ROWS; // wysokosc jednej klatki
+        const fw = playerImg.naturalWidth  / PLAYER_COLS;
+        const fh = playerImg.naturalHeight / PLAYER_ROWS;
         const srcX = playerDir       * fw; // kierunek → kolumna
         const srcY = playerWalkFrame * fh; // klatka   → wiersz
         canvas_context.drawImage(playerImg,
@@ -351,33 +408,44 @@ function drawPlayer() {
     }
 }
 
-// ---- aktualizuje kierunek gracza (wywołaj z app.js przy ruchu) ----
+// ---- aktualizuje kierunek gracza i startuje animację ruchu ----
 // Kierunek gracza → kolumna w gracz.png
 // col 0=dol(przod), col 1=lewo, col 2=gora(plecy), col 3=prawo
 function updatePlayerDir(dr, dc) {
-    if      (dr ===  1) playerDir = 0; // dol   → kolumna 0
-    else if (dc === -1) playerDir = 1; // lewo  → kolumna 1
-    else if (dr === -1) playerDir = 2; // gora  → kolumna 2
-    else if (dc ===  1) playerDir = 3; // prawo → kolumna 3
+    if      (dr ===  1) playerDir = 0;
+    else if (dc === -1) playerDir = 1;
+    else if (dr === -1) playerDir = 2;
+    else if (dc ===  1) playerDir = 3;
+}
+
+// wywolaj gdy gracz faktycznie rusza sie na nowa komorke
+function startPlayerMove(newTargetX, newTargetY) {
+    playerFromX    = playerPixelX;
+    playerFromY    = playerPixelY;
+    playerTargetX  = newTargetX;
+    playerTargetY  = newTargetY;
+    playerMoveStart = performance.now();
 }
 
 // ---- rysuje przedmioty ----
 function drawItems() {
     for (const item of items) {
         if (item.collected) continue;
+        const cx = item.col * cellSize;
+        const cy = item.row * cellSize;
         if (item.type === "heal") {
-            canvas_context.drawImage(healImg, item.col * cellSize, item.row * cellSize, cellSize, cellSize);
+            const sz = 18, off = (cellSize - sz) / 2;
+            canvas_context.drawImage(healImg, cx + off, cy + off, sz, sz);
         } else if (item.type === "key") {
-            canvas_context.drawImage(keyImgs[item.keyId], item.col * cellSize, item.row * cellSize, cellSize, cellSize);
+            // klucz mniejszy — 20x20px wysrodkowany
+            const sz = 20, off = (cellSize - sz) / 2;
+            canvas_context.drawImage(keyImgs[item.keyId], cx + off, cy + off, sz, sz);
         } else if (item.type === "riddle") {
-            canvas_context.fillStyle = "cyan";
-            canvas_context.beginPath();
-            canvas_context.arc(
-                item.col * cellSize + cellSize / 2,
-                item.row * cellSize + cellSize / 2,
-                8, 0, Math.PI * 2
-            );
-            canvas_context.fill();
+            // zagadka — tylko sprite, bez tla
+            const sz = 20, off = (cellSize - sz) / 2;
+            if (zagadkaImg.complete && zagadkaImg.naturalWidth > 0) {
+                canvas_context.drawImage(zagadkaImg, cx + off, cy + off, sz, sz);
+            }
         }
     }
 }
@@ -555,21 +623,28 @@ function updateHUD() {
         });
     }
 
-    // Zagadki
+    // Zagadki — ikona zagadka.png w slotach HTML
     const riddlesEl = document.getElementById("hud-riddles");
     if (riddlesEl) {
-        if (riddlesEl.children.length !== riddlesRequired) {
+        // Przebuduj sloty jesli zmienila sie liczba zagadek
+        if (riddlesEl.dataset.built !== String(riddlesRequired)) {
             riddlesEl.innerHTML = "";
             for (let i = 0; i < riddlesRequired; i++) {
-                const dot = document.createElement("div");
-                dot.className = "hud-riddle-dot needed";
-                riddlesEl.appendChild(dot);
+                const slot = document.createElement("div");
+                slot.className = "hud-riddle-slot";
+                const img = document.createElement("img");
+                img.src = "Assets/zagadka.png";
+                img.className = "hud-riddle-img";
+                slot.appendChild(img);
+                riddlesEl.appendChild(slot);
             }
+            riddlesEl.dataset.built = String(riddlesRequired);
         }
-        const dots = riddlesEl.querySelectorAll(".hud-riddle-dot");
-        dots.forEach(function(dot, i) {
-            if (i < riddlesSolved) dot.classList.add("solved");
-            else                   dot.classList.remove("solved");
+        // Aktualizuj stan — rozwiazane vs nierozwiazane
+        const slots = riddlesEl.querySelectorAll(".hud-riddle-slot");
+        slots.forEach(function(slot, i) {
+            if (i < riddlesSolved) slot.classList.add("solved");
+            else                   slot.classList.remove("solved");
         });
     }
 }
