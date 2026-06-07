@@ -20,7 +20,8 @@ function initEnemies() {
             const newRow = e.row + losowy.dr;
             const newCol = e.col + losowy.dc;
 
-            if (canMove(newRow, newCol)) {
+            const blockedByDoor = doors.some(d => !d.open && d.row === newRow && d.col === newCol);
+            if (canMove(newRow, newCol) && !blockedByDoor) {
                 e.row = newRow;
                 e.col = newCol;
                 if (typeof updateEnemyDir === "function") updateEnemyDir(ei, losowy.dr, losowy.dc);
