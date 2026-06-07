@@ -37,8 +37,7 @@ document.addEventListener("keydown", function (event) {
             blockedDoor.open = true;
             playerRow = newRow;
             playerCol = newCol;
-            playerTargetX = newCol * cellSize;
-            playerTargetY = newRow * cellSize;
+            startPlayerMove(newCol * cellSize, newRow * cellSize);
             playSound(500, 0.3);
             score++;
         } else {
@@ -47,8 +46,7 @@ document.addEventListener("keydown", function (event) {
     } else if (canMove(newRow, newCol)) {
         playerRow = newRow;
         playerCol = newCol;
-        playerTargetX = newCol * cellSize;
-        playerTargetY = newRow * cellSize;
+        startPlayerMove(newCol * cellSize, newRow * cellSize);
         playSound(200, 0.05);
         score++;
     }
